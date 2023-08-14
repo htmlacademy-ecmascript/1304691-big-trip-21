@@ -1,6 +1,8 @@
-import EventsPresenter from './presenter.js';
+import EventsPresenter from './presenter';
+import EventsModel from './model';
 
-const eventsPresenter = new EventsPresenter();
+const eventsModel = new EventsModel();
+const eventsPresenter = new EventsPresenter(eventsModel);
 
 eventsPresenter.init();
 

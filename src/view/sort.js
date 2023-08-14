@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import { createElement } from '../render';
 
 function createSortTeplate() {
   return (
@@ -31,7 +31,7 @@ function createSortTeplate() {
   );
 }
 
-export default class Sort {
+export default class SortView {
   getTemplate() {
     return createSortTeplate();
   }

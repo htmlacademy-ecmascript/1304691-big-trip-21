@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import { createElement } from '../render';
 
 function createFormEditTemplate() {
   return (
@@ -160,7 +160,7 @@ function createFormEditTemplate() {
   );
 }
 
-export default class FormEdit {
+export default class FormEditView {
   getTemplate() {
     return createFormEditTemplate();
   }

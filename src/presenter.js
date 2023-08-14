@@ -1,35 +1,38 @@
-import { RenderPosition, render } from './render.js';
-import FilterView from './view/filters.js';
-import SortView from './view/sort.js';
-import ListEvents from './view/list-events.js';
-import ItemEvents from './view/item-events.js';
-import FormEdit from './view/form-edit.js';
-import FormCreate from './view/form-create.js';
-import InfoEvents from './view/info.js';
-
-const COUNT_WAY_POINT = 3;
+import { RenderPosition, render } from './render';
+import FilterView from './view/filters';
+import SortView from './view/sort';
+import ListView from './view/list';
+import PointView from './view/point';
+import FormEditView from './view/form-edit';
+import FormCreateView from './view/form-create';
+import InfoView from './view/info';
 
 const tripMainEvents = document.querySelector('.trip-main');
 const tripEvents = document.querySelector('.trip-events');
 const tripFilters = document.querySelector('.trip-controls__filters');
-
 export default class EventsPresenter {
 
-  eventsListComponent = new ListEvents();
+  eventsListComponent = new ListView();
+
+  constructor(pointsModel) {
+    this.pointsModel = pointsModel;
+  }
 
   init() {
-    render(new InfoEvents(), tripMainEvents, RenderPosition.AFTERBEGIN);
+    this.points = [...this.pointsModel.getEvents()];
+
+    render(new InfoView(), tripMainEvents, RenderPosition.AFTERBEGIN);
     render(new SortView(), tripEvents);
     render(new FilterView(), tripFilters);
 
     render(this.eventsListComponent, tripEvents);
 
-    for (let i = 0; i < COUNT_WAY_POINT; i++) {
-      render(new ItemEvents(), this.eventsListComponent.getElement());
-    }
+    render(new FormCreateView({ point: this.points[0] }), this.eventsListComponent.getElement());
 
-    render(new FormCreate(), this.eventsListComponent.getElement());
-    render(new FormEdit(), this.eventsListComponent.getElement(), RenderPosition.AFTERBEGIN);
+    for (let i = 1; i < this.points.length; i++) {
+      render(new PointView({ point: this.points[i] }), this.eventsListComponent.getElement());
+    }
+    render(new FormEditView(), this.eventsListComponent.getElement());
   }
 
 }

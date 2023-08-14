@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import { createElement } from '../render';
 
 function createListTemplate() {
   return (
@@ -6,7 +6,7 @@ function createListTemplate() {
   );
 }
 
-export default class ListEvents {
+export default class ListView {
   getTemplate() {
     return createListTemplate();
   }

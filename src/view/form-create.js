@@ -1,6 +1,38 @@
-import { createElement } from '../render.js';
+import { createElement } from '../render';
 
-function createFormTemplate() {
+function createDestinationImg(pictures) {
+  return pictures.map(({ src, description }) => `<img class="event__photo" src="${src}" alt="${description}" />
+  `).join('');
+}
+
+function createTypelist() {
+  return `<div class="event__type-item">
+    <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
+      <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
+  </div>`;
+}
+
+function createOfferItem(offers) {
+  const { offers: offersData } = offers;
+
+  return offersData.map(({ title, price }) => `<div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage">
+        <label class="event__offer-label" for="event-offer-luggage-1">
+          <span class="event__offer-title">${title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${price}</span>
+        </label>
+    </div>`
+  ).join('');
+}
+
+function createFormTemplate(point) {
+  const { destination, offers } = point;
+  const { pictures } = destination;
+
+  const pictureList = createDestinationImg(pictures);
+  const offersList = createOfferItem(offers, point);
+
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -15,51 +47,7 @@ function createFormTemplate() {
               <div class="event__type-list">
                 <fieldset class="event__type-group">
                   <legend class="visually-hidden">Event type</legend>
-
-                  <div class="event__type-item">
-                    <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                      <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                      <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                      <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                      <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                      <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                      <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                      <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                      <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                      <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-                  </div>
+                    ${createTypelist()}
                 </fieldset>
               </div>
           </div>
@@ -100,50 +88,7 @@ function createFormTemplate() {
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
-              <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
-                  <label class="event__offer-label" for="event-offer-luggage-1">
-                    <span class="event__offer-title">Add luggage</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">30</span>
-                  </label>
-              </div>
-
-              <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked>
-                  <label class="event__offer-label" for="event-offer-comfort-1">
-                    <span class="event__offer-title">Switch to comfort class</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">100</span>
-                  </label>
-              </div>
-
-              <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-                  <label class="event__offer-label" for="event-offer-meal-1">
-                    <span class="event__offer-title">Add meal</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">15</span>
-                  </label>
-              </div>
-
-              <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
-                  <label class="event__offer-label" for="event-offer-seats-1">
-                    <span class="event__offer-title">Choose seats</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">5</span>
-                  </label>
-              </div>
-
-              <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
-                  <label class="event__offer-label" for="event-offer-train-1">
-                    <span class="event__offer-title">Travel by train</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">40</span>
-                  </label>
-              </div>
+              ${offersList}
             </div>
           </section>
 
@@ -153,11 +98,7 @@ function createFormTemplate() {
 
             <div class="event__photos-container">
               <div class="event__photos-tape">
-                <img class="event__photo" src="img/photos/1.jpg" alt="Event photo" />
-                <img class="event__photo" src="img/photos/2.jpg" alt="Event photo" />
-                <img class="event__photo" src="img/photos/3.jpg" alt="Event photo" />
-                <img class="event__photo" src="img/photos/4.jpg" alt="Event photo" />
-                <img class="event__photo" src="img/photos/5.jpg" alt="Event photo" />
+                ${pictureList}
               </div>
             </div>
           </section>
@@ -166,10 +107,13 @@ function createFormTemplate() {
     </li>`
   );
 }
+export default class FormCreateView {
+  constructor({ point }) {
+    this.point = point;
+  }
 
-export default class FormCreate {
   getTemplate() {
-    return createFormTemplate();
+    return createFormTemplate(this.point);
   }
 
   getElement() {

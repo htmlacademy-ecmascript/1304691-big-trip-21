@@ -27,8 +27,7 @@ function createFilterTeplate() {
     </form>`
   );
 }
-
-export default class Filters {
+export default class FiltersView {
   getTemplate() {
     return createFilterTeplate();
   }
