@@ -1,7 +1,5 @@
 import { getRandomEvent } from './mock/points-mock';
-
-const EVENTS_COUNT = 4;
-
+import { EVENTS_COUNT } from './const';
 export default class EventsModel {
   events = Array.from({ length: EVENTS_COUNT }, getRandomEvent);
 

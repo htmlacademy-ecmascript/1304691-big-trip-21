@@ -1,8 +1,6 @@
 import { createElement } from '../render';
 import { humanizePointDate, calculateDurationDate } from '../utils';
-
-const DATE_FORMAT_FULL = 'HH:mm';
-const DATE_MONTH_FORMAT = 'MMM D';
+import { DATE_MONTH_FORMAT, DATE_TIME_FORMAT } from '../const';
 
 function createOffer(data) {
   return data.map(({title, price})=> `<li class="event__offer">
@@ -22,8 +20,8 @@ function createPointTemplate(point) {
   const { name } = destination;
   const { offers: offersData } = offers;
 
-  const dateStartFormat = humanizePointDate(dateFrom, DATE_FORMAT_FULL);
-  const dateEndFormat = humanizePointDate(dateTo, DATE_FORMAT_FULL);
+  const dateStartFormat = humanizePointDate(dateFrom, DATE_TIME_FORMAT);
+  const dateEndFormat = humanizePointDate(dateTo, DATE_TIME_FORMAT);
   const dateMonthFormat = humanizePointDate(dateFrom, DATE_MONTH_FORMAT);
 
   const duration = calculateDurationDate(dateTo, dateFrom);
@@ -65,7 +63,6 @@ function createPointTemplate(point) {
     </li>`
   );
 }
-
 export default class PointView {
   constructor({ point }) {
     this.point = point;

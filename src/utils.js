@@ -1,9 +1,5 @@
 import dayjs from 'dayjs';
-
-const DAY_IN_SECONDS = 86400;
-const DAY_IN_HOURS = 24;
-const HOUR_IN_MINUTES = 60;
-const HOUR_IN_SECONDS = 3600;
+import { DAY_IN_HOURS, DAY_IN_SECONDS, HOUR_IN_MINUTES, HOUR_IN_SECONDS } from './const';
 
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];

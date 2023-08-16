@@ -15,7 +15,6 @@ function createInfoTemplate() {
     </section>`
   );
 }
-
 export default class InfoView {
   getTemplate() {
     return createInfoTemplate();
