@@ -1,11 +1,29 @@
-export const EVENTS_COUNT = 5;
+const POINTS_COUNT = 10;
 
-export const DATE_TIME_FORMAT = 'HH:mm';
-export const DATE_MONTH_FORMAT = 'MMM D';
+const DATE_TIME_FORMAT = 'HH:mm';
+const FULL_DATE_TIME_FORMAT = 'DD/MM/YY HH:mm';
+const DATE_MONTH_FORMAT = 'MMM D';
 
-export const DAY_IN_SECONDS = 86400;
-export const DAY_IN_HOURS = 24;
-export const HOUR_IN_MINUTES = 60;
-export const HOUR_IN_SECONDS = 3600;
+const POINT_TYPES = ['Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
 
+const DEFAULT_TYPE = 'taxi';
+
+const POINT_EMPTY = {
+  basePrice: 0,
+  dateFrom: null,
+  dateTo: null,
+  destination: null,
+  isFavorite: false,
+  offers: [],
+  type: DEFAULT_TYPE
+};
+
+export {
+  POINTS_COUNT,
+  DATE_TIME_FORMAT,
+  FULL_DATE_TIME_FORMAT,
+  DATE_MONTH_FORMAT,
+  POINT_TYPES,
+  POINT_EMPTY
+};
 

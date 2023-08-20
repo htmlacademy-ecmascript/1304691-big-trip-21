@@ -1,9 +1,15 @@
-import EventsPresenter from './presenter';
-import EventsModel from './model';
+import PointsPresenter from './presenter/points-presenter';
+import HeaderPresenter from './presenter/header-presenter';
 
-const eventsModel = new EventsModel();
-const eventsPresenter = new EventsPresenter(eventsModel);
+import PointsModel from './model/points-model';
 
-eventsPresenter.init();
+const pointsModel = new PointsModel();
+
+const pointsPresenter = new PointsPresenter(pointsModel);
+
+const headerPresenter = new HeaderPresenter(pointsModel);
+
+pointsPresenter.init();
+headerPresenter.init();
 
 

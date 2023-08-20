@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import { DAY_IN_HOURS, DAY_IN_SECONDS, HOUR_IN_MINUTES, HOUR_IN_SECONDS } from './const';
 
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
@@ -9,21 +8,12 @@ function humanizePointDate(date, format) {
   return date ? dayjs(date).format(format) : '';
 }
 
-function calculateDurationDate(to, from) {
-  let difference = dayjs(to).diff(from, 'second');
+const getRandomInteger = (min, max) => {
+  const lower = Math.ceil(Math.min(min, max));
+  const upper = Math.floor(Math.max(min, max));
+  const result = Math.random() * (upper - lower + 1) + lower;
 
-  const days = Math.floor(difference / DAY_IN_SECONDS);
-  difference -= days * DAY_IN_SECONDS;
+  return Math.floor(result);
+};
 
-  const hours = Math.floor(difference / HOUR_IN_SECONDS % DAY_IN_HOURS);
-  difference -= hours * HOUR_IN_SECONDS;
-
-  const minutes = Math.floor(difference / HOUR_IN_MINUTES % HOUR_IN_MINUTES);
-  difference -= minutes * HOUR_IN_MINUTES;
-
-  const duration = `${days}D ${hours}H ${minutes}M`;
-
-  return duration;
-}
-
-export { getRandomArrayElement, humanizePointDate, calculateDurationDate };
+export { getRandomArrayElement, getRandomInteger, humanizePointDate };
