@@ -6,7 +6,12 @@ const DATE_MONTH_FORMAT = 'MMM D';
 
 const POINT_TYPES = ['Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
 
-const DEFAULT_TYPE = 'taxi';
+const DEFAULT_TYPE = 'Taxi';
+
+const OFFER_EMPTY = {
+  type: DEFAULT_TYPE,
+  offers: []
+};
 
 const POINT_EMPTY = {
   basePrice: 0,
@@ -24,6 +29,7 @@ export {
   FULL_DATE_TIME_FORMAT,
   DATE_MONTH_FORMAT,
   POINT_TYPES,
-  POINT_EMPTY
+  POINT_EMPTY,
+  OFFER_EMPTY
 };
 

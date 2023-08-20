@@ -24,7 +24,6 @@ function getRandomIds() {
       ids.push(currentElement);
     }
   }
-
   return ids;
 }
 

@@ -30,15 +30,14 @@ function isFavorite(value) {
 
 function createOfferItem(offersId, offersByType) {
   let offersList = '';
-  if (offersByType) {
-    offersList = offersByType.offers
-      .filter((offer) => offersId.includes(offer.id))
-      .map((offer) => `<li class="event__offer">
+  offersList = offersByType.offers
+    .filter((offer) => offersId.includes(offer.id))
+    .map((offer) => `<li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
       </li>`).join('');
-  }
+
 
   return offersList;
 }

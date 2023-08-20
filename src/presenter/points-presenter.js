@@ -5,6 +5,7 @@ import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
 import FormCreateView from '../view/form-create-view';
 import { offers, destinations } from '../mock/points-mock';
+import { OFFER_EMPTY } from '../const';
 
 const tripEvents = document.querySelector('.trip-events');
 
@@ -25,7 +26,7 @@ export default class PointsPresenter {
     render(new FormCreateView(
       {
         point: this.points[0],
-        offers: offers.find((offer) => offer.type === this.points[0].type),
+        offers: offers.find((offer) => offer.type === this.points[0].type) ?? OFFER_EMPTY ,
         destinations: destinations
       }),
     this.pointsListComponent.getElement());
@@ -35,7 +36,7 @@ export default class PointsPresenter {
       render(new PointView(
         {
           point: this.points[i],
-          offers: offers.find((offer) => offer.type === this.points[i].type),
+          offers: offers.find((offer) => offer.type === this.points[i].type) ?? OFFER_EMPTY,
           destinations: destinations
         }),
       this.pointsListComponent.getElement());
