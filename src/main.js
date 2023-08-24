@@ -1,7 +1,23 @@
-import EventsPresenter from './presenter.js';
+import PointsPresenter from './presenter/points-presenter';
+import HeaderPresenter from './presenter/header-presenter';
 
-const eventsPresenter = new EventsPresenter();
+import PointsModel from './model/points-model';
+import OffersModel from './model/offers-model';
+import DestinationsModel from './model/destinations-model';
 
-eventsPresenter.init();
+import Service from './service/service';
+
+const service = new Service();
+
+const pointsModel = new PointsModel(service);
+const offersModel = new OffersModel(service);
+const destinationsModel = new DestinationsModel(service);
+
+const pointsPresenter = new PointsPresenter(pointsModel, offersModel, destinationsModel);
+
+const headerPresenter = new HeaderPresenter(pointsModel);
+
+pointsPresenter.init();
+headerPresenter.init();
 
 
