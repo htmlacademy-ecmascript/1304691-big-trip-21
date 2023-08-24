@@ -1,12 +1,10 @@
-import { createListPoints } from '../mock/points-mock';
-import { POINTS_COUNT } from '../const';
-
 export default class PointsModel {
-  points = createListPoints(POINTS_COUNT);
+  constructor(service) {
+    this.service = service;
+    this.points = service.getPoints();
+  }
 
-  getPoints() {
+  get() {
     return this.points;
   }
 }
-
-//console.log(createListPoints(POINTS_COUNT));

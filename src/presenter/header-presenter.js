@@ -7,14 +7,8 @@ const tripFilters = document.querySelector('.trip-controls__filters');
 
 export default class HeaderPresenter {
 
-  constructor(pointsModel) {
-    this.pointsModel = pointsModel;
-  }
-
   init() {
-    this.points = [...this.pointsModel.getPoints()];
     render(new InfoView(), tripMainEvents, RenderPosition.AFTERBEGIN);
-
     render(new FilterView(), tripFilters);
 
   }

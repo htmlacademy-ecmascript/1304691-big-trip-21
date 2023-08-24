@@ -25,29 +25,20 @@ function createOfferItem(offersByType, offersId) {
   }
 }
 
-function createDestinationPoint(destinationId, destinations) {
-  const destinationElement = destinations.find((destination) => destination.id === destinationId);
-  return destinationElement;
-}
-
-function createDestinationImg(destinationId, destinations) {
-  const currentDestination = createDestinationPoint(destinationId, destinations);
-
-  return currentDestination.pictures.map(({ src, description }) => `<img class="event__photo" src="${src}" alt="${description}" />
+function createDestinationImg(destination) {
+  return destination.pictures.map(({ src, description }) => `<img class="event__photo" src="${src}" alt="${description}" />
   `).join('');
 }
 
-function createFormTemplate(point, offersByType, destinations) {
-  const { dateFrom, dateTo, type, offers: offersId, destination: destinationId } = point;
+function createFormTemplate(point, offersByType, destination) {
+  const { dateFrom, dateTo, type, offers: offersId } = point;
 
   const dateStartFormat = humanizePointDate(dateFrom, FULL_DATE_TIME_FORMAT);
   const dateEndFormat = humanizePointDate(dateTo, FULL_DATE_TIME_FORMAT);
 
   const offersList = createOfferItem(offersByType, offersId);
 
-  const pointDestination = createDestinationPoint(destinationId, destinations);
-
-  const destinationPictures = createDestinationImg(destinationId, destinations);
+  const destinationPictures = createDestinationImg(destination);
 
   const typeList = createTypelist();
 
@@ -74,7 +65,7 @@ function createFormTemplate(point, offersByType, destinations) {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${pointDestination.name ? pointDestination.name : ''}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? destination.name : ''}" list="destination-list-1">
               <datalist id="destination-list-1">
                 <option value="Amsterdam"></option>
                 <option value="Geneva"></option>
@@ -111,10 +102,10 @@ function createFormTemplate(point, offersByType, destinations) {
           </section>
           ` : ''}
 
-          ${ destinationPictures || pointDestination.description ? `
+          ${ destinationPictures || destination.description ? `
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${pointDestination.description}</p>
+            <p class="event__destination-description">${destination.description}</p>
 
             <div class="event__photos-container">
               <div class="event__photos-tape">
@@ -131,14 +122,14 @@ function createFormTemplate(point, offersByType, destinations) {
   );
 }
 export default class FormCreateView {
-  constructor({ point = POINT_EMPTY, offers, destinations }) {
+  constructor({ point = POINT_EMPTY, offers, destination }) {
     this.point = point;
     this.offers = offers;
-    this.destinations = destinations;
+    this.destination = destination;
   }
 
   getTemplate() {
-    return createFormTemplate(this.point, this.offers, this.destinations);
+    return createFormTemplate(this.point, this.offers, this.destination);
   }
 
   getElement() {

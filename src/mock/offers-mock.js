@@ -10,7 +10,7 @@ const MAX_OFFER_COUNT = 5;
 
 function createOffer(index) {
   return {
-    id: index + 1,
+    id: index,
     title: getRandomArrayElement(OFFER_TITLES),
     price: getRandomInteger(MIN_OFFER_PRICE, MAX_OFFER_PRICE)
   };

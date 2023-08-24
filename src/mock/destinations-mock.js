@@ -24,7 +24,7 @@ function createPicture() {
 
 function createDestination(index) {
   return {
-    id: index + 1,
+    id: index,
     description: getRandomArrayElement(DESTINATIONS_DESCRIPTIONS),
     name: getRandomArrayElement(CITY_NAMES),
     pictures: Array.from({ length: getRandomInteger(MIN_PICTURES, MAX_PICTURES)}, createPicture)

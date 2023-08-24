@@ -42,16 +42,15 @@ function createOfferItem(offersId, offersByType) {
   return offersList;
 }
 
-function createDestination(destinationId, destinations) {
-  const destinationElement = destinations.find((destination) => destination.id === destinationId);
-  return destinationElement.name;
-}
+// function createDestination(destinationId, destinations) {
+//   const destinationElement = destinations.find((destination) => destination.id === destinationId);
+//   return destinationElement.name;
+// }
 
-function createPointTemplate(point, offersByType, destinations) {
-  const { basePrice, dateFrom, dateTo, type, isFavorite: favoriteValue, offers: offersId, destination: destinationId } = point;
+function createPointTemplate(point, offersByType, destination) {
+  const { basePrice, dateFrom, dateTo, type, isFavorite: favoriteValue, offers: offersId } = point;
 
   const offersList = createOfferItem(offersId, offersByType);
-  const pointDestination = createDestination(destinationId, destinations);
 
   const dateStartFormat = humanizePointDate(dateFrom, DATE_TIME_FORMAT);
   const dateEndFormat = humanizePointDate(dateTo, DATE_TIME_FORMAT);
@@ -71,7 +70,7 @@ function createPointTemplate(point, offersByType, destinations) {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${pointDestination ? pointDestination : ''}</h3>
+        <h3 class="event__title">${type} ${destination.name ? destination.name : ''}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="2019-03-18T10:30">${dateStartFormat}</time>
@@ -99,14 +98,14 @@ function createPointTemplate(point, offersByType, destinations) {
   );
 }
 export default class PointView {
-  constructor({ point, offers, destinations }) {
+  constructor({ point, offers, destination }) {
     this.point = point;
     this.offers = offers;
-    this.destinations = destinations;
+    this.destination = destination;
   }
 
   getTemplate() {
-    return createPointTemplate(this.point, this.offers, this.destinations);
+    return createPointTemplate(this.point, this.offers, this.destination);
   }
 
   getElement() {
@@ -116,5 +115,3 @@ export default class PointView {
     return this.element;
   }
 }
-
-export { createDestination };
