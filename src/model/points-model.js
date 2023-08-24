@@ -1,7 +1,7 @@
 export default class PointsModel {
   constructor(service) {
     this.service = service;
-    this.points = service.getPoints();
+    this.points = this.service.getPoints();
   }
 
   get() {

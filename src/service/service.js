@@ -13,12 +13,12 @@ export default class Service {
   destinations = [];
 
   constructor() {
-    this.offers = this.getOffers();
-    this.destinations = this.getDestinations();
-    this.points = this.getPoints();
+    this.offers = this.generateOffers();
+    this.destinations = this.generateDestinations();
+    this.points = this.generatePoints();
   }
 
-  getPoints() {
+  generatePoints() {
 
     return Array.from({ length: POINTS_COUNT }, (_, index) => {
 
@@ -40,12 +40,24 @@ export default class Service {
 
   }
 
-  getOffers() {
+  generateOffers() {
     return Array.from({ length: OFFERS_COUNT }, createListOffers);
   }
 
-  getDestinations() {
+  generateDestinations() {
     return Array.from({ length: getRandomInteger(1, DESTINATIONS_COUNT) }, (_, index) => createDestination(index));
+  }
+
+  getDestinations() {
+    return this.destinations;
+  }
+
+  getOffers() {
+    return this.offers;
+  }
+
+  getPoints() {
+    return this.points;
   }
 }
 

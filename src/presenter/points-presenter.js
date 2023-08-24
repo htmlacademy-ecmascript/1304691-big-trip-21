@@ -3,7 +3,6 @@ import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
-import FormCreateView from '../view/form-create-view';
 //import { offers, destinations } from '../mock/points-mock';
 import { OFFER_EMPTY } from '../const';
 
@@ -26,14 +25,13 @@ export default class PointsPresenter {
 
     render(this.pointsListComponent, tripEvents);
 
-    render(new FormCreateView(
+    render(new FormEditView(
       {
         point: this.points[0],
         offers: this.offersModel.getByType(this.points[0].type) ?? OFFER_EMPTY,
         destination: this.destinationsModel.getById(this.points[0].destination)
       }),
     this.pointsListComponent.getElement());
-
 
     for (let i = 0; i < this.points.length; i++) {
 
@@ -46,7 +44,6 @@ export default class PointsPresenter {
       this.pointsListComponent.getElement());
 
     }
-    render(new FormEditView(), this.pointsListComponent.getElement());
   }
 
 }
