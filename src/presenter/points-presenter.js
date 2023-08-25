@@ -20,6 +20,8 @@ export default class PointsPresenter {
 
   init() {
     this.points = [...this.pointsModel.get()];
+    this.offers = [...this.offersModel.get()];
+    this.destinations = [...this.destinationsModel.get()];
 
     render(new SortView(), tripEvents);
 
@@ -28,8 +30,8 @@ export default class PointsPresenter {
     render(new FormEditView(
       {
         point: this.points[0],
-        offers: this.offersModel.getByType(this.points[0].type) ?? OFFER_EMPTY,
-        destination: this.destinationsModel.getById(this.points[0].destination)
+        offers: this.offers,
+        destinations: this.destinations
       }),
     this.pointsListComponent.getElement());
 
