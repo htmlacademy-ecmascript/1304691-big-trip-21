@@ -1,10 +1,13 @@
 export default class PointsModel {
-  constructor(service) {
-    this.service = service;
-    this.points = this.service.getPoints();
+  #servise = null;
+  #points = null;
+
+  constructor(servise) {
+    this.#servise = servise;
+    this.#points = this.#servise.getPoints();
   }
 
-  get() {
-    return this.points;
+  get points() {
+    return this.#points;
   }
 }
