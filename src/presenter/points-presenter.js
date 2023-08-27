@@ -3,6 +3,7 @@ import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
+import NoPointsView from '../view/no-points-view';
 import { OFFER_EMPTY } from '../const';
 
 const tripEvents = document.querySelector('.trip-events');
@@ -29,8 +30,17 @@ export default class PointsPresenter {
   }
 
   #renderListPoints() {
-    render(this.#sortComponent, tripEvents);
+
+    if (this.points.length !== 0) {
+      render(this.#sortComponent, tripEvents);
+    }
+
     render(this.#pointsListComponent, tripEvents);
+
+    if (this.points.length === 0) {
+      render(new NoPointsView(), this.#pointsListComponent.element);
+      return;
+    }
 
     for (let i = 0; i < this.points.length; i++) {
 

@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { FULL_DATE_TIME_FORMAT } from '../const';
-import { humanizePointDate } from '../utils';
+import { humanizePointDate } from '../utils/common';
 import { POINT_EMPTY } from '../const';
 
 function createTypelist() {

@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
-import { getRandomInteger } from '../utils';
+import { getRandomInteger } from '../utils/common';
 
 const Ranges = {
   DAYS: {
-    MIN: 1,
+    MIN: 0,
     MAX: 3
   },
   HOURS: {
     MIN: 1,
-    MAX: 23
+    MAX: 10
   },
   MINUTES: {
     MIN: 1,
@@ -17,9 +17,15 @@ const Ranges = {
 };
 
 function getRandomDate() {
-  return dayjs().add(getRandomInteger(Ranges.DAYS.MIN, Ranges.DAYS.MAX), 'day')
-    .add(getRandomInteger(Ranges.HOURS.MIN, Ranges.HOURS.MAX), 'hour')
-    .add(getRandomInteger(Ranges.MINUTES.MIN, Ranges.MINUTES.MAX), 'minute');
+  const index = Boolean(getRandomInteger(0, 1));
+
+  if (index) {
+    return dayjs().add(getRandomInteger(Ranges.DAYS.MIN, Ranges.DAYS.MAX), 'day')
+      .add(getRandomInteger(Ranges.HOURS.MIN, Ranges.HOURS.MAX), 'hour')
+      .add(getRandomInteger(Ranges.MINUTES.MIN, Ranges.MINUTES.MAX), 'minute');
+  }
+
+  return dayjs().subtract(getRandomInteger(Ranges.DAYS.MIN, Ranges.DAYS.MAX), 'day');
 }
 
 function createRandomDates() {

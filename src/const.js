@@ -21,12 +21,20 @@ const POINT_EMPTY = {
   type: DEFAULT_TYPE
 };
 
+const FILTER_TYPE = {
+  ALL: 'Everything',
+  FUTURE: 'Future',
+  PRESENT: 'Present',
+  PAST: 'Past',
+};
+
 export {
   DATE_TIME_FORMAT,
   FULL_DATE_TIME_FORMAT,
   DATE_MONTH_FORMAT,
   POINT_TYPES,
   POINT_EMPTY,
-  OFFER_EMPTY
+  OFFER_EMPTY,
+  FILTER_TYPE
 };
 

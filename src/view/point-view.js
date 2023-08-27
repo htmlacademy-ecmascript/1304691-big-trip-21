@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 import Duration from 'dayjs/plugin/duration';
-import { humanizePointDate } from '../utils';
+import { humanizePointDate } from '../utils/common';
 import { DATE_MONTH_FORMAT, DATE_TIME_FORMAT } from '../const';
 
 const DAY_IN_MILLISECONDS = 86400000;

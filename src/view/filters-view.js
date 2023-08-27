@@ -1,34 +1,35 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createFilterTeplate() {
-  return (
-    ` <form class="trip-filters" action="#" method="get">
-      <div class="trip-filters__filter">
-        <input id="filter-everything" class="trip-filters__filter-input   visually-hidden" type="radio" name="trip-filter" value="everything" checked>
-          <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
-      </div>
+function createFormFilters(filters) {
 
-      <div class="trip-filters__filter">
-        <input id="filter-future" class="trip-filters__filter-input   visually-hidden" type="radio" name="trip-filter" value="future" disabled>
-          <label class="trip-filters__filter-label" for="filter-future">Future</  label>
-      </div>
+  const filterItemsTemplate = filters
+    .map((filter, index) => createFilterTeplate(filter, index === 0))
+    .join('');
 
-      <div class="trip-filters__filter">
-        <input id="filter-present" class="trip-filters__filter-input    visually-hidden" type="radio" name="trip-filter" value="present">
-          <label class="trip-filters__filter-label" for="filter-present">Present</  label>
-      </div>
-
-      <div class="trip-filters__filter">
-        <input id="filter-past" class="trip-filters__filter-input   visually-hidden" type="radio" name="trip-filter" value="past" disabled>
-          <label class="trip-filters__filter-label" for="filter-past">Past</label>
-      </div>
-
-      <button class="visually-hidden" type="submit">Accept filter</button>
-    </form>`
-  );
+  return `<form class="trip-filters" action="#" method="get">${filterItemsTemplate}</form>
+  <button class="visually-hidden" type="submit">Accept filter</button>`;
 }
+
+function createFilterTeplate(filter, isChecked) {
+
+  const {type, count} = filter;
+
+  return `
+    <div class="trip-filters__filter">
+      <input id="filter-${type}" class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter" value="${type}" ${isChecked ? 'checked' : ''} ${count === 0 ? 'disabled' : ''}>
+        <label class="trip-filters__filter-label" for="filter-${type}">${type}</label>
+    </div>`;
+}
+
 export default class FiltersView extends AbstractView {
+  #filters = null;
+
+  constructor(filters) {
+    super();
+    this.#filters = filters;
+  }
+
   get template() {
-    return createFilterTeplate();
+    return createFormFilters(this.#filters);
   }
 }
