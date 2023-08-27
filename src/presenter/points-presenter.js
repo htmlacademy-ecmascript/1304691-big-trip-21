@@ -12,6 +12,7 @@ export default class PointsPresenter {
   #offersModel = null;
   #destinationsModel = null;
   #pointsListComponent = new ListView();
+  #sortComponent = new SortView();
 
   constructor(pointsModel, offersModel, destinationsModel) {
     this.#pointsModel = pointsModel;
@@ -24,29 +25,24 @@ export default class PointsPresenter {
     this.offers = [...this.#offersModel.offers];
     this.destinations = [...this.#destinationsModel.destinations];
 
-    render(new SortView(), tripEvents);
-
+    render(this.#sortComponent, tripEvents);
     render(this.#pointsListComponent, tripEvents);
-
-    render(new FormEditView(
-      {
-        point: this.points[0],
-        offers: this.offers,
-        destinations: this.destinations
-      }),
-    this.#pointsListComponent.element);
 
     for (let i = 0; i < this.points.length; i++) {
 
-      render(new PointView(
-        {
-          point: this.points[i],
-          offers: this.offersModel.getByType(this.points[i].type) ?? OFFER_EMPTY,
-          destination: this.destinationsModel.getById(this.points[i].destination)
-        }),
-      this.#pointsListComponent.element);
+      const point = this.points[i];
+      const offers = this.#offersModel.getByType(this.points[i].type) ?? OFFER_EMPTY;
+      const destination = this.#destinationsModel.getById(this.points[i].destination);
+
+      this.#renderPoint(point, offers, destination);
 
     }
+  }
+
+  #renderPoint(point, offers, destination) {
+    const pointComponent = new PointView({ point, offers, destination });
+
+    render(pointComponent, this.#pointsListComponent.element);
   }
 
 }
