@@ -1,4 +1,4 @@
-import { createElement } from '../render';
+import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 import Duration from 'dayjs/plugin/duration';
 import { humanizePointDate } from '../utils';
@@ -41,11 +41,6 @@ function createOfferItem(offersId, offersByType) {
 
   return offersList;
 }
-
-// function createDestination(destinationId, destinations) {
-//   const destinationElement = destinations.find((destination) => destination.id === destinationId);
-//   return destinationElement.name;
-// }
 
 function createPointTemplate(point, offersByType, destination) {
   const { basePrice, dateFrom, dateTo, type, isFavorite: favoriteValue, offers: offersId } = point;
@@ -97,21 +92,19 @@ function createPointTemplate(point, offersByType, destination) {
     </li>`
   );
 }
-export default class PointView {
+export default class PointView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #destination = null;
+
   constructor({ point, offers, destination }) {
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point, this.offers, this.destination);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
+  get template() {
+    return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 }

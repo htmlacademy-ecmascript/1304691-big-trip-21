@@ -1,9 +1,8 @@
-import { render } from '../render';
+import { render } from '../framework/render';
 import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
-//import { offers, destinations } from '../mock/points-mock';
 import { OFFER_EMPTY } from '../const';
 
 const tripEvents = document.querySelector('.trip-events');
@@ -33,7 +32,7 @@ export default class PointsPresenter {
         offers: this.offers,
         destinations: this.destinations
       }),
-    this.pointsListComponent.getElement());
+    this.pointsListComponent.element);
 
     for (let i = 0; i < this.points.length; i++) {
 
@@ -43,7 +42,7 @@ export default class PointsPresenter {
           offers: this.offersModel.getByType(this.points[i].type) ?? OFFER_EMPTY,
           destination: this.destinationsModel.getById(this.points[i].destination)
         }),
-      this.pointsListComponent.getElement());
+      this.pointsListComponent.element);
 
     }
   }

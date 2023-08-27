@@ -1,4 +1,4 @@
-import { RenderPosition, render } from '../render';
+import { RenderPosition, render } from '../framework/render';
 import FilterView from '../view/filters-view';
 import InfoView from '../view/info-view';
 
@@ -10,7 +10,6 @@ export default class HeaderPresenter {
   init() {
     render(new InfoView(), tripMainEvents, RenderPosition.AFTERBEGIN);
     render(new FilterView(), tripFilters);
-
   }
 
 }

@@ -1,4 +1,4 @@
-import { createElement } from '../render';
+import AbstractView from '../framework/view/abstract-view.js';
 import { FULL_DATE_TIME_FORMAT } from '../const';
 import { humanizePointDate } from '../utils';
 import { POINT_EMPTY } from '../const';
@@ -136,21 +136,19 @@ function createFormTemplate(point, offers, destinations) {
     </li>`
   );
 }
-export default class FormEditView {
+export default class FormEditView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #destinations = null;
+
   constructor({ point = POINT_EMPTY, offers, destinations }) {
-    this.point = point;
-    this.offers = offers;
-    this.destinations = destinations;
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
   }
 
-  getTemplate() {
-    return createFormTemplate(this.point, this.offers, this.destinations);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
+  get template() {
+    return createFormTemplate(this.#point, this.#offers, this.#destinations);
   }
 }
