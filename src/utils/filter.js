@@ -13,8 +13,8 @@ const currentDate = dayjs.utc().format();
 const filter = {
   [FILTER_TYPE.ALL]: (points) => points,
   [FILTER_TYPE.FUTURE]: (points) => points.filter((point) => dayjs(point.dateFrom).isSameOrAfter(currentDate)),
-  [FILTER_TYPE.PRESENT]: (points) => points.filter((point) => dayjs(point.dateFrom).isSameOrBefore(currentDate, 'day') && dayjs(point.dateFrom).isSameOrAfter(currentDate, 'day')),
-  [FILTER_TYPE.PAST]: (points) => points.filter((point) => dayjs(point.dateFrom).isSameOrBefore(currentDate)),
+  [FILTER_TYPE.PRESENT]: (points) => points.filter((point) => dayjs(point.dateFrom).isSameOrBefore(currentDate, 'day') && dayjs(point.dateTo).isSameOrAfter(currentDate, 'day')),
+  [FILTER_TYPE.PAST]: (points) => points.filter((point) => dayjs(point.dateTo).isSameOrBefore(currentDate)),
 };
 
 export { filter };
