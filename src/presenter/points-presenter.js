@@ -67,7 +67,7 @@ export default class PointsPresenter {
 
     const FormEditComponent = new FormEditView(
       {
-        point: this.points[0],
+        point: point,
         offers: this.offers,
         destinations: this.destinations,
         onSaveButtonClick: () => {
@@ -86,7 +86,6 @@ export default class PointsPresenter {
     }
 
     render(pointComponent, this.#pointsListComponent.element);
-
 
   }
 
