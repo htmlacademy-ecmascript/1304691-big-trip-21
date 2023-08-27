@@ -25,10 +25,10 @@ export default class PointsPresenter {
     this.offers = [...this.#offersModel.offers];
     this.destinations = [...this.#destinationsModel.destinations];
 
-    this.#renderBoard();
+    this.#renderListPoints();
   }
 
-  #renderBoard() {
+  #renderListPoints() {
     render(this.#sortComponent, tripEvents);
     render(this.#pointsListComponent, tripEvents);
 
