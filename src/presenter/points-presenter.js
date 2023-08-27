@@ -1,4 +1,4 @@
-import { render } from '../framework/render';
+import { render, replace } from '../framework/render';
 import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import PointView from '../view/point-view';
@@ -40,9 +40,50 @@ export default class PointsPresenter {
   }
 
   #renderPoint(point, offers, destination) {
-    const pointComponent = new PointView({ point, offers, destination });
+
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        replaceFormEditToPoint();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    const pointComponent = new PointView(
+      {
+        point,
+        offers,
+        destination,
+        onEditButtonClick: () => {
+          replacePointToFormEdit();
+          document.addEventListener('keydown', escKeyDownHandler);
+        }
+      }
+    );
+
+    const FormEditComponent = new FormEditView(
+      {
+        point: this.points[0],
+        offers: this.offers,
+        destinations: this.destinations,
+        onSaveButtonClick: () => {
+          replaceFormEditToPoint();
+          document.removeEventListener('keydown', escKeyDownHandler);
+        }
+      }
+    );
+
+    function replacePointToFormEdit() {
+      replace(FormEditComponent, pointComponent);
+    }
+
+    function replaceFormEditToPoint() {
+      replace(pointComponent, FormEditComponent);
+    }
 
     render(pointComponent, this.#pointsListComponent.element);
+
+
   }
 
 }

@@ -140,15 +140,25 @@ export default class FormEditView extends AbstractView {
   #point = null;
   #offers = null;
   #destinations = null;
+  #handleFormSave = null;
 
-  constructor({ point = POINT_EMPTY, offers, destinations }) {
+  constructor({ point = POINT_EMPTY, offers, destinations, onSaveButtonClick }) {
     super();
     this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
+    this.#handleFormSave = onSaveButtonClick;
+
+    this.element.querySelector('form')
+      .addEventListener('submit', this.#formSaveHandler);
   }
 
   get template() {
     return createFormTemplate(this.#point, this.#offers, this.#destinations);
   }
+
+  #formSaveHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSave();
+  };
 }
