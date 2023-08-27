@@ -1,7 +1,7 @@
 import { createDestination } from '../mock/destinations-mock';
 import { createListOffers } from '../mock/offers-mock';
 import { createPoint } from '../mock/points-mock';
-import { getRandomArrayElement, getRandomInteger } from '../utils';
+import { getRandomArrayElement, getRandomInteger } from '../utils/common';
 
 const OFFERS_COUNT = 10;
 const DESTINATIONS_COUNT = 10;

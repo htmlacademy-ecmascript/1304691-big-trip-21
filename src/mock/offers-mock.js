@@ -1,4 +1,4 @@
-import { getRandomArrayElement, getRandomInteger } from '../utils';
+import { getRandomArrayElement, getRandomInteger } from '../utils/common';
 import { POINT_TYPES } from '../const';
 
 const OFFER_TITLES = ['Add luggage', 'Switch to comfort ', 'Rent a car', 'Book tickets', 'Lunch in city', 'Order Uber', 'Add breakfast'];

@@ -1,4 +1,4 @@
-import { getRandomArrayElement, getRandomInteger } from '../utils';
+import { getRandomArrayElement, getRandomInteger } from '../utils/common';
 import { createRandomDates } from '../mock/dates';
 import { POINT_TYPES } from '../const';
 
