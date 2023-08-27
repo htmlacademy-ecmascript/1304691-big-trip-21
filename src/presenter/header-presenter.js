@@ -6,9 +6,19 @@ const tripMainEvents = document.querySelector('.trip-main');
 const tripFilters = document.querySelector('.trip-controls__filters');
 
 export default class HeaderPresenter {
+  #pointsModel = null;
+
+  constructor(pointsModel) {
+    this.#pointsModel = pointsModel;
+  }
 
   init() {
-    render(new InfoView(), tripMainEvents, RenderPosition.AFTERBEGIN);
+    this.points = [...this.#pointsModel.points];
+
+    if (this.points.length !== 0) {
+      render(new InfoView(), tripMainEvents, RenderPosition.AFTERBEGIN);
+    }
+
     render(new FilterView(), tripFilters);
   }
 
