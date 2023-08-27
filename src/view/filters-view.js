@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createFilterTeplate() {
+function createFilterTeplate(filters) {
   return (
     ` <form class="trip-filters" action="#" method="get">
       <div class="trip-filters__filter">
@@ -28,7 +28,14 @@ function createFilterTeplate() {
   );
 }
 export default class FiltersView extends AbstractView {
+  #filters = null;
+
+  constructor(filters) {
+    super();
+    this.#filters = filters;
+  }
+
   get template() {
-    return createFilterTeplate();
+    return createFilterTeplate(this.#filters);
   }
 }
