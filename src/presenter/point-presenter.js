@@ -13,34 +13,29 @@ export default class PointPresenter {
   #pointComponent = null;
   #formEditComponent = null;
 
-  constructor({ point, offersByType, destination, containerPoints, allOffers, allDestinations }) {
-    this.#point = point;
-    this.#offersByType = offersByType;
-    this.#destination = destination;
+  constructor({ containerPoints }) {
     this.#containerPoints = containerPoints;
-    this.#allOffers = allOffers;
-    this.#allDestinations = allDestinations;
   }
 
-  init() {
+  init({ point, offersByType, destination, allOffers, allDestinations }) {
 
     const prevPointComponent = this.#pointComponent;
     const prevFormEditComponent = this.#formEditComponent;
 
     this.#pointComponent = new PointView(
       {
-        point: this.#point,
-        offers: this.#offersByType,
-        destination: this.#destination,
+        point,
+        offers: offersByType,
+        destination: destination,
         onEditButtonClick: this.#onEditButtonClick
       }
     );
 
     this.#formEditComponent = new FormEditView(
       {
-        point: this.#point,
-        offers: this.#allOffers,
-        destinations: this.#allDestinations,
+        point: point,
+        offers: allOffers,
+        destinations: allDestinations,
         onSaveButtonClick: this.#onSaveButtonClick
       }
     );

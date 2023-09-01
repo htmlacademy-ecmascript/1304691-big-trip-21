@@ -4,6 +4,7 @@ import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
 import { OFFER_EMPTY } from '../const';
 import PointPresenter from './point-presenter';
+import { updateItem } from '../utils/common';
 
 const tripEvents = document.querySelector('.trip-events');
 
@@ -32,6 +33,11 @@ export default class PointsPresenter {
     this.#renderPointsList();
   }
 
+  #onPointChange = (updatedPoint) => {
+    this.#points = updateItem(this.#points, updatedPoint);
+    this.pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
+
   #renderPoints() {
     this.#points.forEach((point) => {
       const offersByType = this.#offersModel.getByType(point.type) ?? OFFER_EMPTY;
@@ -42,16 +48,21 @@ export default class PointsPresenter {
 
   #renderPoint(point, offersByType, destination) {
 
-    const pointPresenter = new PointPresenter({
-      point,
-      offersByType,
-      destination,
-      containerPoints: this.#pointsListComponent.element,
-      allOffers: this.offers,
-      allDestinations: this.destinations
-    });
+    const pointPresenter = new PointPresenter(
+      {
+        containerPoints: this.#pointsListComponent.element,
+      }
+    );
 
-    pointPresenter.init();
+    pointPresenter.init(
+      {
+        point,
+        offersByType,
+        destination,
+        allOffers: this.offers,
+        allDestinations: this.destinations
+      }
+    );
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
