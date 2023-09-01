@@ -1,10 +1,9 @@
-import { render, replace } from '../framework/render';
+import { RenderPosition, render } from '../framework/render';
 import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
-import PointView from '../view/point-view';
-import FormEditView from '../view/form-edit-view';
 import NoPointsView from '../view/no-points-view';
 import { OFFER_EMPTY } from '../const';
+import PointPresenter from './point-presenter';
 
 const tripEvents = document.querySelector('.trip-events');
 
@@ -15,6 +14,7 @@ export default class PointsPresenter {
   #pointsListComponent = new ListView();
   #sortComponent = new SortView();
   #noPointsComponent = new NoPointsView();
+  #pointPresenter = null;
 
   #points = [];
 
@@ -29,31 +29,33 @@ export default class PointsPresenter {
     this.offers = [...this.#offersModel.offers];
     this.destinations = [...this.#destinationsModel.destinations];
 
-    this.#renderListContainer();
+    this.#renderPointsList();
   }
 
-  #renderSort() {
-    render(this.#sortComponent, tripEvents);
+  #renderPoints() {
+    this.#points.forEach((point) => {
+      const offersByType = this.#offersModel.getByType(point.type) ?? OFFER_EMPTY;
+      const destination = this.#destinationsModel.getById(point.destination);
+      this.#renderPoint(point, offersByType, destination);
+    });
   }
 
-  #renderNoPoints() {
-    render(this.#noPointsComponent, this.#pointsListComponent.element);
+  #renderPoint(point, offersByType, destination) {
+
+    this.#pointPresenter = new PointPresenter({
+      point,
+      offersByType,
+      destination,
+      containerPoints: this.#pointsListComponent.element,
+      allOffers: this.offers,
+      allDestinations: this.destinations
+    });
+
+    this.#pointPresenter.init();
+
   }
 
   #renderPointsList() {
-
-    for (let i = 0; i < this.#points.length; i++) {
-
-      const point = this.#points[i];
-      const offers = this.#offersModel.getByType(this.#points[i].type) ?? OFFER_EMPTY;
-      const destination = this.#destinationsModel.getById(this.#points[i].destination);
-
-      this.#renderPoint(point, offers, destination);
-
-    }
-  }
-
-  #renderListContainer() {
     render(this.#pointsListComponent, tripEvents);
 
     if (this.#points.length === 0) {
@@ -62,53 +64,15 @@ export default class PointsPresenter {
     }
 
     this.#renderSort();
-    this.#renderPointsList();
+    this.#renderPoints();
   }
 
-  #renderPoint(point, offers, destination) {
+  #renderNoPoints() {
+    render(this.#noPointsComponent, this.#pointsListComponent.element);
+  }
 
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceFormEditToPoint();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-
-    const pointComponent = new PointView(
-      {
-        point,
-        offers,
-        destination,
-        onEditButtonClick: () => {
-          replacePointToFormEdit();
-          document.addEventListener('keydown', escKeyDownHandler);
-        }
-      }
-    );
-
-    const FormEditComponent = new FormEditView(
-      {
-        point: point,
-        offers: this.offers,
-        destinations: this.destinations,
-        onSaveButtonClick: () => {
-          replaceFormEditToPoint();
-          document.removeEventListener('keydown', escKeyDownHandler);
-        }
-      }
-    );
-
-    function replacePointToFormEdit() {
-      replace(FormEditComponent, pointComponent);
-    }
-
-    function replaceFormEditToPoint() {
-      replace(pointComponent, FormEditComponent);
-    }
-
-    render(pointComponent, this.#pointsListComponent.element);
-
+  #renderSort() {
+    render(this.#sortComponent, tripEvents, RenderPosition.AFTERBEGIN);
   }
 
 }
