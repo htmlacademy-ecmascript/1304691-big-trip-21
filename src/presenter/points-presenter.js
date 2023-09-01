@@ -14,6 +14,9 @@ export default class PointsPresenter {
   #destinationsModel = null;
   #pointsListComponent = new ListView();
   #sortComponent = new SortView();
+  #noPointsComponent = new NoPointsView();
+
+  #points = [];
 
   constructor(pointsModel, offersModel, destinationsModel) {
     this.#pointsModel = pointsModel;
@@ -22,35 +25,44 @@ export default class PointsPresenter {
   }
 
   init() {
-    this.points = [...this.#pointsModel.points];
+    this.#points = [...this.#pointsModel.points];
     this.offers = [...this.#offersModel.offers];
     this.destinations = [...this.#destinationsModel.destinations];
 
-    this.#renderListPoints();
+    this.#renderListContainer();
   }
 
-  #renderListPoints() {
+  #renderSort() {
+    render(this.#sortComponent, tripEvents);
+  }
 
-    if (this.points.length !== 0) {
-      render(this.#sortComponent, tripEvents);
-    }
+  #renderNoPoints() {
+    render(this.#noPointsComponent, this.#pointsListComponent.element);
+  }
 
-    render(this.#pointsListComponent, tripEvents);
+  #renderPointsList() {
 
-    if (this.points.length === 0) {
-      render(new NoPointsView(), this.#pointsListComponent.element);
-      return;
-    }
+    for (let i = 0; i < this.#points.length; i++) {
 
-    for (let i = 0; i < this.points.length; i++) {
-
-      const point = this.points[i];
-      const offers = this.#offersModel.getByType(this.points[i].type) ?? OFFER_EMPTY;
-      const destination = this.#destinationsModel.getById(this.points[i].destination);
+      const point = this.#points[i];
+      const offers = this.#offersModel.getByType(this.#points[i].type) ?? OFFER_EMPTY;
+      const destination = this.#destinationsModel.getById(this.#points[i].destination);
 
       this.#renderPoint(point, offers, destination);
 
     }
+  }
+
+  #renderListContainer() {
+    render(this.#pointsListComponent, tripEvents);
+
+    if (this.#points.length === 0) {
+      this.#renderNoPoints();
+      return;
+    }
+
+    this.#renderSort();
+    this.#renderPointsList();
   }
 
   #renderPoint(point, offers, destination) {
