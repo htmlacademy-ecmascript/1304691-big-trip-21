@@ -3,37 +3,37 @@ import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
 
 export default class PointPresenter {
-  #point = null;
-  #offersByType = null;
-  #destination = null;
   #containerPoints = null;
-  #allOffers = null;
-  #allDestinations = null;
-
   #pointComponent = null;
   #formEditComponent = null;
+  #onDataChange = null;
+  #point = null;
 
-  constructor({ containerPoints }) {
+  constructor({ containerPoints, onDataChange }) {
     this.#containerPoints = containerPoints;
+    this.#onDataChange = onDataChange;
   }
 
   init({ point, offersByType, destination, allOffers, allDestinations }) {
+
+    this.#point = point;
 
     const prevPointComponent = this.#pointComponent;
     const prevFormEditComponent = this.#formEditComponent;
 
     this.#pointComponent = new PointView(
       {
-        point,
+        point: this.#point,
         offers: offersByType,
         destination: destination,
-        onEditButtonClick: this.#onEditButtonClick
+        onEditButtonClick: this.#onEditButtonClick,
+        onFavoriteButtonClick: this.#onFavoriteButtonClick
       }
     );
 
     this.#formEditComponent = new FormEditView(
       {
-        point: point,
+        point: this.#point,
         offers: allOffers,
         destinations: allDestinations,
         onSaveButtonClick: this.#onSaveButtonClick
@@ -79,6 +79,10 @@ export default class PointPresenter {
 
   #onSaveButtonClick = () => {
     this.#replaceFormEditToPoint();
+  };
+
+  #onFavoriteButtonClick = () => {
+    this.#onDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
   };
 
   #onEscapeKeyDown = (evt) => {

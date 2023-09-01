@@ -35,13 +35,23 @@ export default class PointsPresenter {
 
   #onPointChange = (updatedPoint) => {
     this.#points = updateItem(this.#points, updatedPoint);
-    this.pointPresenters.get(updatedPoint.id).init(updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(
+      {
+        point: updatedPoint,
+        offersByType: this.#offersModel.getByType(updatedPoint.type) ?? OFFER_EMPTY,
+        destination: this.#destinationsModel.getById(updatedPoint.destination),
+        allOffers: this.offers,
+        allDestinations: this.destinations
+      }
+    );
   };
 
   #renderPoints() {
     this.#points.forEach((point) => {
+
       const offersByType = this.#offersModel.getByType(point.type) ?? OFFER_EMPTY;
       const destination = this.#destinationsModel.getById(point.destination);
+
       this.#renderPoint(point, offersByType, destination);
     });
   }
@@ -51,6 +61,7 @@ export default class PointsPresenter {
     const pointPresenter = new PointPresenter(
       {
         containerPoints: this.#pointsListComponent.element,
+        onDataChange: this.#onPointChange
       }
     );
 
