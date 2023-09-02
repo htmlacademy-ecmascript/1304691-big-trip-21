@@ -46,6 +46,10 @@ export default class PointsPresenter {
     );
   };
 
+  #onModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
   #renderPoints() {
     this.#points.forEach((point) => {
 
@@ -61,7 +65,8 @@ export default class PointsPresenter {
     const pointPresenter = new PointPresenter(
       {
         containerPoints: this.#pointsListComponent.element,
-        onDataChange: this.#onPointChange
+        onDataChange: this.#onPointChange,
+        onModeChange: this.#onModeChange
       }
     );
 
