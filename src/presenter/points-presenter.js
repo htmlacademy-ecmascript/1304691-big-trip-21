@@ -13,7 +13,7 @@ export default class PointsPresenter {
   #offersModel = null;
   #destinationsModel = null;
   #pointsListComponent = new ListView();
-  #sortComponent = new SortView();
+  #sortComponent = null;
   #noPointsComponent = new NoPointsView();
 
   #points = [];
@@ -49,6 +49,18 @@ export default class PointsPresenter {
   #onModeChange = () => {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
+
+  #onSortChange = (sortType) => {
+  // - Сортируем точки
+    // - Очищаем список
+    // - Рендерим список заново
+  };
+
+  #renderSort() {
+    this.#sortComponent = new SortView({
+      onSortChange: this.#onSortChange
+    });
+  }
 
   #renderPoints() {
     this.#points.forEach((point) => {
@@ -101,10 +113,6 @@ export default class PointsPresenter {
 
   #renderNoPoints() {
     render(this.#noPointsComponent, this.#pointsListComponent.element);
-  }
-
-  #renderSort() {
-    render(this.#sortComponent, tripEvents, RenderPosition.AFTERBEGIN);
   }
 
 }
