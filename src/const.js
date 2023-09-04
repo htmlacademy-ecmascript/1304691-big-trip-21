@@ -21,11 +21,19 @@ const POINT_EMPTY = {
   type: DEFAULT_TYPE
 };
 
-const FILTER_TYPE = {
+const FilterType = {
   ALL: 'Everything',
   FUTURE: 'Future',
   PRESENT: 'Present',
   PAST: 'Past',
+};
+
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offer'
 };
 
 export {
@@ -35,6 +43,7 @@ export {
   POINT_TYPES,
   POINT_EMPTY,
   OFFER_EMPTY,
-  FILTER_TYPE
+  FilterType,
+  SortType
 };
 
