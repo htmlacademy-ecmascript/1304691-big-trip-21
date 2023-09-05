@@ -29,11 +29,11 @@ const FilterType = {
 };
 
 const SortType = {
-  DAY: 'day',
+  DEFAULT: 'day',
   EVENT: 'event',
   TIME: 'time',
   PRICE: 'price',
-  OFFERS: 'offer'
+  OFFER: 'offer'
 };
 
 export {

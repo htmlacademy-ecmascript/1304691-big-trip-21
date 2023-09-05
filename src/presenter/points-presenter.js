@@ -5,6 +5,8 @@ import NoPointsView from '../view/no-points-view';
 import { OFFER_EMPTY } from '../const';
 import PointPresenter from './point-presenter';
 import { updateItem } from '../utils/common';
+import { SortType } from '../const';
+import { sortPointsByTime, sortPointsByPrice } from '../utils/common';
 
 const tripEvents = document.querySelector('.trip-events');
 
@@ -15,6 +17,8 @@ export default class PointsPresenter {
   #pointsListComponent = new ListView();
   #sortComponent = null;
   #noPointsComponent = new NoPointsView();
+  #currentSortType = SortType.DAY;
+  #sourcedPoints = [];
 
   #points = [];
   #pointPresenters = new Map();
@@ -30,11 +34,13 @@ export default class PointsPresenter {
     this.offers = [...this.#offersModel.offers];
     this.destinations = [...this.#destinationsModel.destinations];
 
+    this.#sourcedPoints = [...this.#pointsModel.points];
     this.#renderPointsList();
   }
 
   #onPointChange = (updatedPoint) => {
     this.#points = updateItem(this.#points, updatedPoint);
+    this.#sourcedPoints = updateItem(this.#sourcedPoints, updatedPoint);
     this.#pointPresenters.get(updatedPoint.id).init(
       {
         point: updatedPoint,
@@ -51,15 +57,38 @@ export default class PointsPresenter {
   };
 
   #onSortChange = (sortType) => {
-  // - Сортируем точки
-    // - Очищаем список
-    // - Рендерим список заново
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
+    this.#clearPointsList();
+    this.#renderPoints();
   };
+
+  #sortPoints(sortType) {
+
+    switch (sortType) {
+      case SortType.TIME:
+        this.#points.sort(sortPointsByTime);
+        break;
+      case SortType.PRICE:
+        this.#points.sort(sortPointsByPrice);
+        break;
+      default:
+        this.#points = [...this.#sourcedPoints];
+        break;
+    }
+
+    this.#currentSortType = sortType;
+
+  }
 
   #renderSort() {
     this.#sortComponent = new SortView({
       onSortChange: this.#onSortChange
     });
+    render(this.#sortComponent, this.#pointsListComponent.element, RenderPosition.AFTERBEGIN);
   }
 
   #renderPoints() {
