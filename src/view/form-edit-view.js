@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { FULL_DATE_TIME_FORMAT } from '../const';
 import { humanizePointDate } from '../utils/common';
 import { POINT_EMPTY } from '../const';
@@ -33,19 +33,19 @@ function createDestinationImg(destination) {
 
 function createFormTemplate(point, offers, destinations) {
 
-  const { dateFrom, dateTo, type, offers: offersId, basePrice, destination: destinationId } = point;
+  const { dateFrom, dateTo, type, offers: offersId, basePrice, destination: destinationId, isDestinationChanged, isTypeChanged } = point;
 
   if (point === POINT_EMPTY) {
     destinations = point.destination;
   }
 
   if (destinations) {
-    destinations = destinations.find((item) => item.id === destinationId);
+    destinations = destinations.find((item) => item.id === isDestinationChanged);
   }
 
   const destinationPictures = createDestinationImg(destinations);
 
-  offers = offers.find((offer) => offer.type === type);
+  offers = offers.find((offer) => offer.type === isTypeChanged);
 
   const offersList = createOfferItem(offers, offersId);
 
@@ -61,7 +61,7 @@ function createFormTemplate(point, offers, destinations) {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${isTypeChanged}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -75,7 +75,7 @@ function createFormTemplate(point, offers, destinations) {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${type}
+              ${isTypeChanged}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinations ? destinations.name : ''}" list="destination-list-1">
               <datalist id="destination-list-1">
@@ -136,7 +136,7 @@ function createFormTemplate(point, offers, destinations) {
     </li>`
   );
 }
-export default class FormEditView extends AbstractView {
+export default class FormEditView extends AbstractStatefulView {
   #point = null;
   #offers = null;
   #destinations = null;
@@ -144,7 +144,9 @@ export default class FormEditView extends AbstractView {
 
   constructor({ point = POINT_EMPTY, offers, destinations, onSaveButtonClick }) {
     super();
-    this.#point = point;
+    this._setState(FormEditView.parseOffersToState(point));
+
+    //this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
     this.#handleFormSave = onSaveButtonClick;
@@ -157,11 +159,36 @@ export default class FormEditView extends AbstractView {
   }
 
   get template() {
-    return createFormTemplate(this.#point, this.#offers, this.#destinations);
+    return createFormTemplate(this._state, this.#offers, this.#destinations);
   }
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSave();
+    this.#handleFormSave(FormEditView.parseStateToOffers(this._state));
   };
+
+  static parseOffersToState(point) {
+    return {
+      ...point,
+      isTypeChanged: point.type,
+      isDestinationChanged: point.destination
+    };
+  }
+
+  static parseStateToOffers(state) {
+    const point = { ...state };
+
+    if (point.isTypeChanged !== point.type) {
+      console.log('Данные типа поездки изменились');
+    }
+
+    if (point.isDestinationChanged !== point.destination) {
+      console.log('Данные пункта назначения изменились');
+    }
+
+    delete point.isTypeChanged;
+    delete point.isDestinationChanged;
+
+    return point;
+  }
 }
