@@ -14,11 +14,14 @@ export default class PointPresenter {
   #onModeChange = null;
   #point = null;
   #mode = Mode.DEFAULT;
+  #allPoints = null;
+  #allTypesPoints = new Set();
 
-  constructor({ containerPoints, onDataChange, onModeChange }) {
+  constructor({ containerPoints, onDataChange, onModeChange, allPoints }) {
     this.#containerPoints = containerPoints;
     this.#onDataChange = onDataChange;
     this.#onModeChange = onModeChange;
+    this.#allPoints = allPoints;
   }
 
   init({ point, offersByType, destination, allOffers, allDestinations }) {
@@ -43,6 +46,7 @@ export default class PointPresenter {
         point: this.#point,
         offers: allOffers,
         destinations: allDestinations,
+        allTypesPoints: this.#getTypesOfAllPoints(),
         onSaveButtonClick: this.#onSaveButtonClick
       }
     );
@@ -63,6 +67,11 @@ export default class PointPresenter {
     remove(prevPointComponent);
     remove(prevFormEditComponent);
 
+  }
+
+  #getTypesOfAllPoints() {
+    this.#allPoints.forEach((points) => this.#allTypesPoints.add(points.type));
+    return this.#allTypesPoints;
   }
 
   resetView() {

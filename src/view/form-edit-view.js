@@ -1,13 +1,13 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { FULL_DATE_TIME_FORMAT } from '../const';
-import { humanizePointDate } from '../utils/common';
+import { humanizePointDate, capitalizeFirstLetterToLower } from '../utils/common';
 import { POINT_EMPTY } from '../const';
 
-function createTypelist() {
-  return `<div class="event__type-item">
-    <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-      <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-  </div>`;
+function createTypelist([...types]) {
+  return types.map((type) => `<div class="event__type-item">
+    <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
+      <label class="event__type-label  event__type-label--${capitalizeFirstLetterToLower(type)}" for="event-type-${capitalizeFirstLetterToLower(type)}-1">${type}</label>
+  </div>`).join('');
 }
 
 function createOfferItem(offersByType, offersId) {
@@ -31,9 +31,9 @@ function createDestinationImg(destination) {
   }
 }
 
-function createFormTemplate(point, offers, destinations) {
+function createFormTemplate(point, offers, destinations, allTypesPoints) {
 
-  const { dateFrom, dateTo, type, offers: offersId, basePrice, destination: destinationId, isDestinationChanged, isTypeChanged } = point;
+  const { dateFrom, dateTo, offers: offersId, basePrice, isDestinationChanged, isTypeChanged } = point;
 
   if (point === POINT_EMPTY) {
     destinations = point.destination;
@@ -52,7 +52,7 @@ function createFormTemplate(point, offers, destinations) {
   const dateStartFormat = humanizePointDate(dateFrom, FULL_DATE_TIME_FORMAT);
   const dateEndFormat = humanizePointDate(dateTo, FULL_DATE_TIME_FORMAT);
 
-  const typeList = createTypelist();
+  const typeList = createTypelist(allTypesPoints);
 
   return (
     `<li class="trip-events__item">
@@ -141,14 +141,16 @@ export default class FormEditView extends AbstractStatefulView {
   #offers = null;
   #destinations = null;
   #handleFormSave = null;
+  #allTypesPoints = null;
 
-  constructor({ point = POINT_EMPTY, offers, destinations, onSaveButtonClick }) {
+  constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick }) {
     super();
     this._setState(FormEditView.parseOffersToState(point));
 
     //this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
+    this.#allTypesPoints = allTypesPoints;
     this.#handleFormSave = onSaveButtonClick;
 
     this.element.querySelector('form')
@@ -159,7 +161,7 @@ export default class FormEditView extends AbstractStatefulView {
   }
 
   get template() {
-    return createFormTemplate(this._state, this.#offers, this.#destinations);
+    return createFormTemplate(this._state, this.#offers, this.#destinations, this.#allTypesPoints);
   }
 
   #formSaveHandler = (evt) => {

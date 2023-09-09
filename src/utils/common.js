@@ -36,6 +36,10 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function capitalizeFirstLetterToLower(string) {
+  return string.charAt(0).toLowerCase() + string.slice(1);
+}
+
 function getWeightForNullDate(dateA, dateB) {
   if (dateA === null && dateB === null) {
     return 0;
@@ -64,4 +68,14 @@ function sortPointsByPrice(pointA, pointB) {
   return pointB.basePrice - pointA.basePrice;
 }
 
-export { getRandomArrayElement, getRandomInteger, humanizePointDate, updateItem, capitalizeFirstLetter, getDifference, sortPointsByTime, sortPointsByPrice };
+export {
+  getRandomArrayElement,
+  getRandomInteger,
+  humanizePointDate,
+  updateItem,
+  capitalizeFirstLetter,
+  getDifference,
+  sortPointsByTime,
+  sortPointsByPrice,
+  capitalizeFirstLetterToLower
+};

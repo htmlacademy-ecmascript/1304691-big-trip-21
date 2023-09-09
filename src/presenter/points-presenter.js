@@ -75,7 +75,7 @@ export default class PointsPresenter {
       case SortType.PRICE:
         this.#points.sort(sortPointsByPrice);
         break;
-      default:
+      case SortType.DEFAULT:
         this.#points = [...this.#sourcedPoints];
         break;
     }
@@ -107,7 +107,8 @@ export default class PointsPresenter {
       {
         containerPoints: this.#pointsListComponent.element,
         onDataChange: this.#onPointChange,
-        onModeChange: this.#onModeChange
+        onModeChange: this.#onModeChange,
+        allPoints: this.#points
       }
     );
 
