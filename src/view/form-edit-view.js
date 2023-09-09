@@ -204,6 +204,12 @@ export default class FormEditView extends AbstractStatefulView {
     }
   };
 
+  reset(point) {
+    this.updateElement(
+      FormEditView.parseOffersToState(point)
+    );
+  }
+
   static parseOffersToState(point) {
     return {
       ...point,
@@ -216,11 +222,11 @@ export default class FormEditView extends AbstractStatefulView {
     const point = { ...state };
 
     if (point.isTypeChanged !== point.type) {
-      console.log('Данные типа поездки изменились');
+      point.type = point.isTypeChanged;
     }
 
     if (point.isDestinationChanged !== point.destination) {
-      console.log('Данные пункта назначения изменились');
+      point.destination = point.isDestinationChanged;
     }
 
     delete point.isTypeChanged;
