@@ -5,7 +5,7 @@ import { POINT_EMPTY } from '../const';
 
 function createTypelist([...types]) {
   return types.map((type) => `<div class="event__type-item">
-    <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
+    <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${capitalizeFirstLetterToLower(type)}">
       <label class="event__type-label  event__type-label--${capitalizeFirstLetterToLower(type)}" for="event-type-${capitalizeFirstLetterToLower(type)}-1">${type}</label>
   </div>`).join('');
 }
@@ -158,6 +158,12 @@ export default class FormEditView extends AbstractStatefulView {
 
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#formSaveHandler);
+
+    this.element.querySelector('.event__type-list')
+      .addEventListener('click', this.#onChangeType);
+
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('click', this.#onChangeDestination);
   }
 
   get template() {
@@ -167,6 +173,31 @@ export default class FormEditView extends AbstractStatefulView {
   #formSaveHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSave(FormEditView.parseStateToOffers(this._state));
+  };
+
+  #onChangeType = (evt) => {
+    if (evt.target.tagName !== 'LABEL') {
+      return;
+    }
+    evt.preventDefault();
+
+    const currentTypeElement = evt.target;
+    const currentTypeItemElement = currentTypeElement.closest('.event__type-item');
+    const currentInput = currentTypeItemElement.querySelector('.event__type-input');
+
+    console.log(currentInput.value)
+    this.updateElement({
+      isTypeChanged: currentInput.value,
+    });
+  };
+
+  #onChangeDestination = (evt) => {
+    evt.preventDefault();
+
+    console.log(evt.target.value)
+    this.updateElement({
+      isDestinationChanged: evt.target.value,
+    });
   };
 
   static parseOffersToState(point) {
