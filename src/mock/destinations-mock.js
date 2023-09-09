@@ -1,6 +1,6 @@
 import { getRandomArrayElement, getRandomInteger } from '../utils/common';
 
-const CITY_NAMES = ['Chamonix', 'Geneva', 'Amsterdam', 'Rome', ' 	Barcelona', ' Valencia', 'Jerusalem', 'Kyoto'];
+const CITY_NAMES = ['Chamonix', 'Geneva', 'Amsterdam', 'Rome', 'Barcelona', 'Valencia', 'Jerusalem', 'Kyoto'];
 
 const DESTINATIONS_DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit',

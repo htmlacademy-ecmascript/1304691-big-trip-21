@@ -1,13 +1,13 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { FULL_DATE_TIME_FORMAT } from '../const';
-import { humanizePointDate } from '../utils/common';
+import { humanizePointDate, capitalizeFirstLetterToLower } from '../utils/common';
 import { POINT_EMPTY } from '../const';
 
-function createTypelist() {
-  return `<div class="event__type-item">
-    <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-      <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-  </div>`;
+function createTypelist([...types]) {
+  return types.map((type) => `<div class="event__type-item">
+    <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
+      <label class="event__type-label  event__type-label--${capitalizeFirstLetterToLower(type)}" for="event-type-${capitalizeFirstLetterToLower(type)}-1">${type}</label>
+  </div>`).join('');
 }
 
 function createOfferItem(offersByType, offersId) {
@@ -31,28 +31,28 @@ function createDestinationImg(destination) {
   }
 }
 
-function createFormTemplate(point, offers, destinations) {
+function createFormTemplate(point, offers, destinations, allTypesPoints) {
 
-  const { dateFrom, dateTo, type, offers: offersId, basePrice, destination: destinationId } = point;
+  const { dateFrom, dateTo, offers: offersId, basePrice, isDestinationChanged, isTypeChanged } = point;
 
   if (point === POINT_EMPTY) {
     destinations = point.destination;
   }
 
   if (destinations) {
-    destinations = destinations.find((item) => item.id === destinationId);
+    destinations = destinations.find((item) => item.id === isDestinationChanged);
   }
 
   const destinationPictures = createDestinationImg(destinations);
 
-  offers = offers.find((offer) => offer.type === type);
+  offers = offers.find((offer) => offer.type === isTypeChanged);
 
   const offersList = createOfferItem(offers, offersId);
 
   const dateStartFormat = humanizePointDate(dateFrom, FULL_DATE_TIME_FORMAT);
   const dateEndFormat = humanizePointDate(dateTo, FULL_DATE_TIME_FORMAT);
 
-  const typeList = createTypelist();
+  const typeList = createTypelist(allTypesPoints);
 
   return (
     `<li class="trip-events__item">
@@ -61,7 +61,7 @@ function createFormTemplate(point, offers, destinations) {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${isTypeChanged}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -75,7 +75,7 @@ function createFormTemplate(point, offers, destinations) {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${type}
+              ${isTypeChanged}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinations ? destinations.name : ''}" list="destination-list-1">
               <datalist id="destination-list-1">
@@ -136,32 +136,102 @@ function createFormTemplate(point, offers, destinations) {
     </li>`
   );
 }
-export default class FormEditView extends AbstractView {
-  #point = null;
+export default class FormEditView extends AbstractStatefulView {
   #offers = null;
   #destinations = null;
   #handleFormSave = null;
+  #allTypesPoints = null;
 
-  constructor({ point = POINT_EMPTY, offers, destinations, onSaveButtonClick }) {
+  constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick }) {
     super();
-    this.#point = point;
+    this._setState(FormEditView.parseOffersToState(point));
+
     this.#offers = offers;
     this.#destinations = destinations;
+    this.#allTypesPoints = allTypesPoints;
     this.#handleFormSave = onSaveButtonClick;
 
+    this._restoreHandlers();
+  }
+
+  get template() {
+    return createFormTemplate(this._state, this.#offers, this.#destinations, this.#allTypesPoints);
+  }
+
+  _restoreHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSaveHandler);
 
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#formSaveHandler);
-  }
 
-  get template() {
-    return createFormTemplate(this.#point, this.#offers, this.#destinations);
+    this.element.querySelector('.event__type-list')
+      .addEventListener('click', this.#onChangeType);
+
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('input', this.#onChangeDestination);
   }
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSave();
+    this.#handleFormSave(FormEditView.parseStateToOffers(this._state));
   };
+
+  #onChangeType = (evt) => {
+    if (evt.target.tagName !== 'LABEL') {
+      return;
+    }
+    evt.preventDefault();
+
+    const currentTypeElement = evt.target;
+    const currentTypeItemElement = currentTypeElement.closest('.event__type-item');
+    const currentInput = currentTypeItemElement.querySelector('.event__type-input');
+
+    this.updateElement({
+      isTypeChanged: currentInput.value,
+    });
+  };
+
+  #onChangeDestination = (evt) => {
+    evt.preventDefault();
+
+    const currentDestinationId = this.#destinations.find(({ name }) => evt.target.value === name);
+
+    if (currentDestinationId) {
+      this.updateElement({
+        isDestinationChanged: currentDestinationId.id,
+      });
+    }
+  };
+
+  reset(point) {
+    this.updateElement(
+      FormEditView.parseOffersToState(point)
+    );
+  }
+
+  static parseOffersToState(point) {
+    return {
+      ...point,
+      isTypeChanged: point.type,
+      isDestinationChanged: point.destination
+    };
+  }
+
+  static parseStateToOffers(state) {
+    const point = { ...state };
+
+    if (point.isTypeChanged !== point.type) {
+      point.type = point.isTypeChanged;
+    }
+
+    if (point.isDestinationChanged !== point.destination) {
+      point.destination = point.isDestinationChanged;
+    }
+
+    delete point.isTypeChanged;
+    delete point.isDestinationChanged;
+
+    return point;
+  }
 }
