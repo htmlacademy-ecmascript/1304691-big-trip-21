@@ -5,7 +5,7 @@ import { POINT_EMPTY } from '../const';
 
 function createTypelist([...types]) {
   return types.map((type) => `<div class="event__type-item">
-    <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${capitalizeFirstLetterToLower(type)}">
+    <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
       <label class="event__type-label  event__type-label--${capitalizeFirstLetterToLower(type)}" for="event-type-${capitalizeFirstLetterToLower(type)}-1">${type}</label>
   </div>`).join('');
 }
@@ -137,7 +137,6 @@ function createFormTemplate(point, offers, destinations, allTypesPoints) {
   );
 }
 export default class FormEditView extends AbstractStatefulView {
-  #point = null;
   #offers = null;
   #destinations = null;
   #handleFormSave = null;
@@ -147,12 +146,19 @@ export default class FormEditView extends AbstractStatefulView {
     super();
     this._setState(FormEditView.parseOffersToState(point));
 
-    //this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
     this.#allTypesPoints = allTypesPoints;
     this.#handleFormSave = onSaveButtonClick;
 
+    this._restoreHandlers();
+  }
+
+  get template() {
+    return createFormTemplate(this._state, this.#offers, this.#destinations, this.#allTypesPoints);
+  }
+
+  _restoreHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSaveHandler);
 
@@ -163,11 +169,7 @@ export default class FormEditView extends AbstractStatefulView {
       .addEventListener('click', this.#onChangeType);
 
     this.element.querySelector('.event__input--destination')
-      .addEventListener('click', this.#onChangeDestination);
-  }
-
-  get template() {
-    return createFormTemplate(this._state, this.#offers, this.#destinations, this.#allTypesPoints);
+      .addEventListener('input', this.#onChangeDestination);
   }
 
   #formSaveHandler = (evt) => {
@@ -185,7 +187,6 @@ export default class FormEditView extends AbstractStatefulView {
     const currentTypeItemElement = currentTypeElement.closest('.event__type-item');
     const currentInput = currentTypeItemElement.querySelector('.event__type-input');
 
-    console.log(currentInput.value)
     this.updateElement({
       isTypeChanged: currentInput.value,
     });
@@ -194,10 +195,13 @@ export default class FormEditView extends AbstractStatefulView {
   #onChangeDestination = (evt) => {
     evt.preventDefault();
 
-    console.log(evt.target.value)
-    this.updateElement({
-      isDestinationChanged: evt.target.value,
-    });
+    const currentDestinationId = this.#destinations.find(({ name }) => evt.target.value === name);
+
+    if (currentDestinationId) {
+      this.updateElement({
+        isDestinationChanged: currentDestinationId.id,
+      });
+    }
   };
 
   static parseOffersToState(point) {
