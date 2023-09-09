@@ -2,12 +2,24 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { FULL_DATE_TIME_FORMAT } from '../const';
 import { humanizePointDate, capitalizeFirstLetterToLower } from '../utils/common';
 import { POINT_EMPTY } from '../const';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createTypelist([...types]) {
   return types.map((type) => `<div class="event__type-item">
     <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
       <label class="event__type-label  event__type-label--${capitalizeFirstLetterToLower(type)}" for="event-type-${capitalizeFirstLetterToLower(type)}-1">${type}</label>
   </div>`).join('');
+}
+
+function createDestinationsList(destinations) {
+  if (destinations) {
+    return `<datalist id="destination-list-1">${createDestinationsItems(destinations)}</datalist>`;
+  }
+}
+
+function createDestinationsItems(destinations) {
+  return destinations.map((destination) => `<option value="${destination.name}"></option>`).join('');
 }
 
 function createOfferItem(offersByType, offersId) {
@@ -38,6 +50,8 @@ function createFormTemplate(point, offers, destinations, allTypesPoints) {
   if (point === POINT_EMPTY) {
     destinations = point.destination;
   }
+
+  const destinationsList = createDestinationsList(destinations);
 
   if (destinations) {
     destinations = destinations.find((item) => item.id === isDestinationChanged);
@@ -78,11 +92,7 @@ function createFormTemplate(point, offers, destinations, allTypesPoints) {
               ${isTypeChanged}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinations ? destinations.name : ''}" list="destination-list-1">
-              <datalist id="destination-list-1">
-                <option value="Amsterdam"></option>
-                <option value="Geneva"></option>
-                <option value="Chamonix"></option>
-              </datalist>
+            ${destinations ? destinationsList : ''}
           </div>
 
           <div class="event__field-group  event__field-group--time">
@@ -141,6 +151,7 @@ export default class FormEditView extends AbstractStatefulView {
   #destinations = null;
   #handleFormSave = null;
   #allTypesPoints = null;
+  #datePicker = null;
 
   constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick }) {
     super();
@@ -158,6 +169,15 @@ export default class FormEditView extends AbstractStatefulView {
     return createFormTemplate(this._state, this.#offers, this.#destinations, this.#allTypesPoints);
   }
 
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datePicker) {
+      this.#datePicker.destroy();
+      this.#datePicker = null;
+    }
+  }
+
   _restoreHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSaveHandler);
@@ -170,11 +190,25 @@ export default class FormEditView extends AbstractStatefulView {
 
     this.element.querySelector('.event__input--destination')
       .addEventListener('input', this.#onChangeDestination);
+
+    this.#setDatePicker();
   }
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSave(FormEditView.parseStateToOffers(this._state));
+  };
+
+  #onChangeDateFrom = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #onChangeDateTo = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
   };
 
   #onChangeType = (evt) => {
@@ -207,6 +241,27 @@ export default class FormEditView extends AbstractStatefulView {
   reset(point) {
     this.updateElement(
       FormEditView.parseOffersToState(point)
+    );
+  }
+
+  #setDatePicker() {
+    this.#datePicker = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateFrom,
+        onChange: this.#onChangeDateFrom,
+      },
+    );
+    this.#datePicker = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateTo,
+        onChange: this.#onChangeDateTo,
+      },
     );
   }
 
