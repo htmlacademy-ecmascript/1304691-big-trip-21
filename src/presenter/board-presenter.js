@@ -127,7 +127,7 @@ export default class PointsPresenter {
       this.#renderNoPoints();
       return;
     }
-    
+
     render(this.#pointsListComponent, tripEvents);
 
     this.#renderSort();
