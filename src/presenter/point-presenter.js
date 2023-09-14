@@ -1,11 +1,13 @@
 import { render, replace, remove } from '../framework/render';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
+import { OFFER_EMPTY } from '../const';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING'
 };
+
 export default class PointPresenter {
   #containerPoints = null;
   #pointComponent = null;
@@ -14,17 +16,21 @@ export default class PointPresenter {
   #onModeChange = null;
   #point = null;
   #mode = Mode.DEFAULT;
-  #allPoints = null;
+  #offersModel = null;
+  #destinationsModel = null;
+  #pointsModel = null;
   #allTypesPoints = new Set();
 
-  constructor({ containerPoints, onDataChange, onModeChange, allPoints }) {
+  constructor({ containerPoints, offersModel, destinationsModel,onDataChange, pointsModel, onModeChange }) {
     this.#containerPoints = containerPoints;
     this.#onDataChange = onDataChange;
     this.#onModeChange = onModeChange;
-    this.#allPoints = allPoints;
+    this.#offersModel = offersModel;
+    this.#pointsModel = pointsModel;
+    this.#destinationsModel = destinationsModel
   }
 
-  init({ point, offersByType, destination, allOffers, allDestinations }) {
+  init(point) {
 
     this.#point = point;
 
@@ -34,8 +40,8 @@ export default class PointPresenter {
     this.#pointComponent = new PointView(
       {
         point: this.#point,
-        offers: offersByType,
-        destination: destination,
+        offers: this.#offersModel.getByType(point.type) ?? OFFER_EMPTY,
+        destination: this.#destinationsModel.getById(point.destination),
         onEditButtonClick: this.#onEditButtonClick,
         onFavoriteButtonClick: this.#onFavoriteButtonClick
       }
@@ -44,8 +50,8 @@ export default class PointPresenter {
     this.#formEditComponent = new FormEditView(
       {
         point: this.#point,
-        offers: allOffers,
-        destinations: allDestinations,
+        offers: this.#offersModel.offers,
+        destinations: this.#destinationsModel.destinations,
         allTypesPoints: this.#getTypesOfAllPoints(),
         onSaveButtonClick: this.#onSaveButtonClick
       }
@@ -70,7 +76,7 @@ export default class PointPresenter {
   }
 
   #getTypesOfAllPoints() {
-    this.#allPoints.forEach((points) => this.#allTypesPoints.add(points.type));
+    this.#pointsModel.points.forEach((points) => this.#allTypesPoints.add(points.type));
     return this.#allTypesPoints;
   }
 
