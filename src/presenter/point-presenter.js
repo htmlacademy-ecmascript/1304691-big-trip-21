@@ -53,7 +53,8 @@ export default class PointPresenter {
         offers: this.#offersModel.offers,
         destinations: this.#destinationsModel.destinations,
         allTypesPoints: this.#getTypesOfAllPoints(),
-        onSaveButtonClick: this.#onSaveButtonClick
+        onSaveButtonClick: this.#onSaveButtonClick,
+        onResetButtonClick: this.#onResetButtonClick
       }
     );
 
@@ -110,6 +111,11 @@ export default class PointPresenter {
   };
 
   #onSaveButtonClick = () => {
+    this.#replaceFormEditToPoint();
+  };
+
+  #onResetButtonClick = () => {
+    this.#formEditComponent.reset(this.#point);
     this.#replaceFormEditToPoint();
   };
 

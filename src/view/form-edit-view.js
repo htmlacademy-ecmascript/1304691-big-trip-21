@@ -25,7 +25,7 @@ function createDestinationsItems(destinations) {
 function createOfferItem(offersByType, offersId) {
   if (offersByType) {
     return offersByType.offers.map(({ title, price, id }) => `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${offersId.includes(id) ? 'checked' : ''}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" data-id="${id}" type="checkbox" name="event-offer-luggage" ${offersId.includes(id) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-luggage-1">
           <span class="event__offer-title">${title}</span>
           &plus;&euro;&nbsp;
@@ -130,7 +130,7 @@ function createFormTemplate({ state, destinations, offers, allTypesPoints }) {
           ${destinations ? `
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${destinations.description}</p>
+            <p class="event__destination-description">${destinations.description ? destinations.description : ''}</p>
 
             <div class="event__photos-container">
               <div class="event__photos-tape">
@@ -150,10 +150,11 @@ export default class FormEditView extends AbstractStatefulView {
   #offers = null;
   #destinations = null;
   #handleFormSave = null;
+  #handleFormClose = null;
   #allTypesPoints = null;
   #datePicker = null;
 
-  constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick }) {
+  constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick, onResetButtonClick }) {
     super();
     this._setState(FormEditView.parsePointToState({ point }));
 
@@ -161,6 +162,7 @@ export default class FormEditView extends AbstractStatefulView {
     this.#destinations = destinations;
     this.#allTypesPoints = allTypesPoints;
     this.#handleFormSave = onSaveButtonClick;
+    this.#handleFormClose = onResetButtonClick;
 
     this._restoreHandlers();
   }
@@ -188,7 +190,7 @@ export default class FormEditView extends AbstractStatefulView {
       .addEventListener('submit', this.#formSaveHandler);
 
     this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#formSaveHandler);
+      .addEventListener('click', this.#resetClickHandler);
 
     this.element.querySelector('.event__type-group')
       .addEventListener('change', this.#typeChangeHandler);
@@ -232,30 +234,46 @@ export default class FormEditView extends AbstractStatefulView {
     });
   };
 
-  #offerChangeHandler() {
+  #resetClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormClose();
+  };
 
-  }
+  #offerChangeHandler = () => {
+    const checkedBoxes = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
 
-  #priceChangeHandler() {
+    this._setState({
+      point: {
+        ...this._state.point,
+        offers: checkedBoxes.map((element) => element.dataset.id)
+      }
+    });
+  };
 
-  }
+  #priceChangeHandler = (evt) => {
+    this._setState({
+      point: {
+        ...this._state.point,
+        basePrice: +evt.target.value
+      }
+    });
+  };
 
   #destinationChangeHandler = (evt) => {
-    evt.preventDefault();
+    const currentDestination = this.#destinations.find(({ name }) => evt.target.value === name);
 
-    const currentDestinationId = this.#destinations.find(({ name }) => evt.target.value === name);
+    const currentDestinationId = (currentDestination) ? currentDestination.id : null;
 
-    if (currentDestinationId) {
-      this.updateElement({
-        destination: currentDestinationId.id,
-      });
-    }
+    this.updateElement({
+      point: {
+        ...this._state.point,
+        destination: currentDestinationId
+      }
+    });
   };
 
   reset(point) {
-    this.updateElement(
-      FormEditView.parsePointToState({ point })
-    );
+    this.updateElement({ point });
   }
 
   #setDatePicker() {
