@@ -42,7 +42,7 @@ const enabledSortType = {
   [SortType.TIME]: true,
   [SortType.PRICE]: true,
   [SortType.OFFER]: false,
-}
+};
 
 export {
   DATE_TIME_FORMAT,

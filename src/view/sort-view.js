@@ -22,8 +22,8 @@ function createSortItem({type, isChecked, isDisabled}) {
 function createSortTemplate(items) {
 
   const sortItemsTemplate = items
-  .map((item) => createSortItem(item))
-  .join('');
+    .map((item) => createSortItem(item))
+    .join('');
 
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">${sortItemsTemplate}</form>`
