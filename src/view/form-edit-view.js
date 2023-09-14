@@ -43,23 +43,23 @@ function createDestinationImg(destination) {
   }
 }
 
-function createFormTemplate(point, offers, destinations, allTypesPoints) {
+function createFormTemplate({ state, destinations, offers, allTypesPoints }) {
 
-  const { dateFrom, dateTo, offers: offersId, basePrice, isDestinationChanged, isTypeChanged } = point;
+  const { dateFrom, dateTo, offers: offersId, basePrice, destination, type } = state.point;
 
-  if (point === POINT_EMPTY) {
-    destinations = point.destination;
+  if (state.point === POINT_EMPTY) {
+    destinations = state.destination;
   }
 
   const destinationsList = createDestinationsList(destinations);
 
   if (destinations) {
-    destinations = destinations.find((item) => item.id === isDestinationChanged);
+    destinations = destinations.find((item) => item.id === destination);
   }
 
   const destinationPictures = createDestinationImg(destinations);
 
-  offers = offers.find((offer) => offer.type === isTypeChanged);
+  offers = offers.find((offer) => offer.type === type);
 
   const offersList = createOfferItem(offers, offersId);
 
@@ -75,7 +75,7 @@ function createFormTemplate(point, offers, destinations, allTypesPoints) {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${isTypeChanged}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -89,7 +89,7 @@ function createFormTemplate(point, offers, destinations, allTypesPoints) {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${isTypeChanged}
+              ${type}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinations ? destinations.name : ''}" list="destination-list-1">
             ${destinations ? destinationsList : ''}
@@ -112,7 +112,7 @@ function createFormTemplate(point, offers, destinations, allTypesPoints) {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          ${point === POINT_EMPTY ? '<button class="event__reset-btn" type="reset">Cancel</button>' : `
+          ${state.point === POINT_EMPTY ? '<button class="event__reset-btn" type="reset">Cancel</button>' : `
             <button class="event__reset-btn" type="reset">Delete</button>
             <button class="event__rollup-btn" type="button"><span class="visually-hidden" > Open event</span></button >
           ` }
@@ -155,7 +155,7 @@ export default class FormEditView extends AbstractStatefulView {
 
   constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick }) {
     super();
-    this._setState(FormEditView.parseOffersToState(point));
+    this._setState(FormEditView.parsePointToState({ point }));
 
     this.#offers = offers;
     this.#destinations = destinations;
@@ -166,7 +166,12 @@ export default class FormEditView extends AbstractStatefulView {
   }
 
   get template() {
-    return createFormTemplate(this._state, this.#offers, this.#destinations, this.#allTypesPoints);
+    return createFormTemplate({
+      state: this._state,
+      destinations: this.#destinations,
+      offers: this.#offers,
+      allTypesPoints: this.#allTypesPoints
+    });
   }
 
   removeElement() {
@@ -185,62 +190,71 @@ export default class FormEditView extends AbstractStatefulView {
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#formSaveHandler);
 
-    this.element.querySelector('.event__type-list')
-      .addEventListener('click', this.#onChangeType);
+    this.element.querySelector('.event__type-group')
+      .addEventListener('change', this.#typeChangeHandler);
 
     this.element.querySelector('.event__input--destination')
-      .addEventListener('input', this.#onChangeDestination);
+      .addEventListener('change', this.#destinationChangeHandler);
+
+    this.element.querySelector('.event__available-offers')
+      ?.addEventListener('change', this.#offerChangeHandler);
+
+    this.element.querySelector('.event__input--price')
+      .addEventListener('change', this.#priceChangeHandler);
 
     this.#setDatePicker();
   }
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSave(FormEditView.parseStateToOffers(this._state));
+    this.#handleFormSave(FormEditView.parseStateToPoint(this._state));
   };
 
-  #onChangeDateFrom = ([userDate]) => {
+  #dateFromChangeHandler = ([userDate]) => {
     this.updateElement({
       dateFrom: userDate,
     });
   };
 
-  #onChangeDateTo = ([userDate]) => {
+  #dateToChangeHandler = ([userDate]) => {
     this.updateElement({
       dateTo: userDate,
     });
   };
 
-  #onChangeType = (evt) => {
-    if (evt.target.tagName !== 'LABEL') {
-      return;
-    }
-    evt.preventDefault();
-
-    const currentTypeElement = evt.target;
-    const currentTypeItemElement = currentTypeElement.closest('.event__type-item');
-    const currentInput = currentTypeItemElement.querySelector('.event__type-input');
-
+  #typeChangeHandler = (evt) => {
     this.updateElement({
-      isTypeChanged: currentInput.value,
+      point: {
+        ...this._state.point,
+        type: evt.target.value,
+        offers: []
+      }
     });
   };
 
-  #onChangeDestination = (evt) => {
+  #offerChangeHandler() {
+
+  }
+
+  #priceChangeHandler() {
+
+  }
+
+  #destinationChangeHandler = (evt) => {
     evt.preventDefault();
 
     const currentDestinationId = this.#destinations.find(({ name }) => evt.target.value === name);
 
     if (currentDestinationId) {
       this.updateElement({
-        isDestinationChanged: currentDestinationId.id,
+        destination: currentDestinationId.id,
       });
     }
   };
 
   reset(point) {
     this.updateElement(
-      FormEditView.parseOffersToState(point)
+      FormEditView.parsePointToState(point)
     );
   }
 
@@ -251,7 +265,7 @@ export default class FormEditView extends AbstractStatefulView {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateFrom,
-        onChange: this.#onChangeDateFrom,
+        onChange: this.#dateFromChangeHandler,
       },
     );
     this.#datePicker = flatpickr(
@@ -260,33 +274,16 @@ export default class FormEditView extends AbstractStatefulView {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateTo,
-        onChange: this.#onChangeDateTo,
+        onChange: this.#dateToChangeHandler,
       },
     );
   }
 
-  static parseOffersToState(point) {
-    return {
-      ...point,
-      isTypeChanged: point.type,
-      isDestinationChanged: point.destination
-    };
+  static parsePointToState({ point }) {
+    return { point };
   }
 
-  static parseStateToOffers(state) {
-    const point = { ...state };
-
-    if (point.isTypeChanged !== point.type) {
-      point.type = point.isTypeChanged;
-    }
-
-    if (point.isDestinationChanged !== point.destination) {
-      point.destination = point.isDestinationChanged;
-    }
-
-    delete point.isTypeChanged;
-    delete point.isDestinationChanged;
-
-    return point;
+  static parseStateToPoint(state) {
+    return state.point;
   }
 }
