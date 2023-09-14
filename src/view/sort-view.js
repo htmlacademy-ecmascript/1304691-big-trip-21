@@ -1,43 +1,49 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { SortType } from '../const.js';
 import { capitalizeFirstLetter } from '../utils/common.js';
 
-function createSortItem() {
-  return Object.values(SortType).map((value) => `<div class="trip-sort__item  trip-sort__item--${value}">
+function createSortItem({type, isChecked, isDisabled}) {
+
+  return `<div class="trip-sort__item  trip-sort__item--${type}">
     <input
-    id="sort-${value}"
+    id="sort-${type}"
     class="trip-sort__input
     visually-hidden"
     type="radio"
     name="trip-sort"
-    value="sort-${value}"
-    ${value === SortType.EVENT || value === SortType.OFFER ? 'disabled' : ''}
-    ${value === SortType.DEFAULT ? 'checked' : ''}
-    >
-      <label class="trip-sort__btn" for="sort-${value}" data-sort-type="${value}">${capitalizeFirstLetter(value)}</label>
+    value="sort-${type}"
+    ${isDisabled ? 'disabled' : ''}
+    ${isChecked ? 'checked' : ''}>
+      <label class="trip-sort__btn" for="sort-${type}" data-sort-type="${type}">${capitalizeFirstLetter(type)}</label>
     </div>
-  `).join('');
+  `;
+
 }
 
-function createSortTemplate() {
+function createSortTemplate(items) {
+
+  const sortItemsTemplate = items
+  .map((item) => createSortItem(item))
+  .join('');
+
   return (
-    `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-        ${createSortItem()}
-    </form>`
+    `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">${sortItemsTemplate}</form>`
   );
 }
 
 export default class SortView extends AbstractView {
-  #onSortChange = null;
+  #handleSortChange = null;
+  #items = [];
 
-  constructor({ onSortChange }) {
+  constructor({ sortItems, onSortChange }) {
     super();
-    this.#onSortChange = onSortChange;
 
-    this.element.addEventListener('click', this.#onSortTypeChange);
+    this.#items = sortItems;
+    this.#handleSortChange = onSortChange;
+
+    this.element.addEventListener('click', this.#sortTypeChangeHandler);
   }
 
-  #onSortTypeChange = (evt) => {
+  #sortTypeChangeHandler = (evt) => {
     if (evt.target.tagName !== 'LABEL') {
       return;
     }
@@ -47,7 +53,7 @@ export default class SortView extends AbstractView {
     const currentTypeItemElement = currentTypeElement.closest('.trip-sort__item');
     const currentInput = currentTypeItemElement.querySelector('.trip-sort__input');
 
-    this.#onSortChange(currentTypeElement.dataset.sortType);
+    this.#handleSortChange(currentTypeElement.dataset.sortType);
     this.#setAttributeSort(currentInput);
   };
 
@@ -60,6 +66,6 @@ export default class SortView extends AbstractView {
   }
 
   get template() {
-    return createSortTemplate();
+    return createSortTemplate(this.#items);
   }
 }
