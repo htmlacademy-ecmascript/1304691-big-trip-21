@@ -111,8 +111,7 @@ export default class PointPresenter {
   };
 
   #saveButtonClickHandler = (updatedPoint) => {
-    console.log(updatedPoint)
-    this.#handlePointChange(updatedPoint);
+    this.#handlePointChange({ ...this.point, ...updatedPoint });
     this.#replaceFormEditToPoint();
   };
 
