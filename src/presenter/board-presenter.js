@@ -8,19 +8,19 @@ import { SortType, enabledSortType } from '../const';
 import { sortPointsByTime, sortPointsByPrice } from '../utils/common';
 
 const tripEvents = document.querySelector('.trip-events');
-
 export default class PointsPresenter {
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
-  #pointsListComponent = new ListView();
   #sortComponent = null;
-  #noPointsComponent = new NoPointsView();
-  #currentSortType = SortType.DEFAULT;
-  #sourcedPoints = [];
 
-  #points = [];
+  #pointsListComponent = new ListView();
+  #noPointsComponent = new NoPointsView();
+
   #pointPresenters = new Map();
+  #sourcedPoints = [];
+  #points = [];
+  #currentSortType = SortType.DEFAULT;
 
   constructor({pointsModel, offersModel, destinationsModel}) {
     this.#pointsModel = pointsModel;
@@ -35,17 +35,17 @@ export default class PointsPresenter {
     this.#renderBoard();
   }
 
-  #onPointChange = (updatedPoint) => {
+  #pointChangeHandler = (updatedPoint) => {
     this.#points = updateItem(this.#points, updatedPoint);
     this.#sourcedPoints = updateItem(this.#sourcedPoints, updatedPoint);
     this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
 
-  #onModeChange = () => {
+  #modeChangeHandler = () => {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #onSortChange = (sortType) => {
+  #sortChangeHandler = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
     }
@@ -78,7 +78,7 @@ export default class PointsPresenter {
 
     this.#sortComponent = new SortView({
       sortItems: sortItems,
-      onSortChange: this.#onSortChange
+      onSortChange: this.#sortChangeHandler
     });
 
     render(this.#sortComponent, this.#pointsListComponent.element, RenderPosition.AFTERBEGIN);
@@ -108,8 +108,8 @@ export default class PointsPresenter {
         offersModel: this.#offersModel,
         destinationsModel: this.#destinationsModel,
         pointsModel: this.#pointsModel,
-        onDataChange: this.#onPointChange,
-        onModeChange: this.#onModeChange,
+        onPointChange: this.#pointChangeHandler,
+        onModeChange: this.#modeChangeHandler,
       }
     );
 

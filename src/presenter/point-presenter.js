@@ -12,8 +12,8 @@ export default class PointPresenter {
   #containerPoints = null;
   #pointComponent = null;
   #formEditComponent = null;
-  #onDataChange = null;
-  #onModeChange = null;
+  #handlePointChange = null;
+  #handleModeChange = null;
   #point = null;
   #mode = Mode.DEFAULT;
   #offersModel = null;
@@ -21,10 +21,10 @@ export default class PointPresenter {
   #pointsModel = null;
   #allTypesPoints = new Set();
 
-  constructor({ containerPoints, offersModel, destinationsModel,onDataChange, pointsModel, onModeChange }) {
+  constructor({ containerPoints, offersModel, destinationsModel, onPointChange, pointsModel, onModeChange }) {
     this.#containerPoints = containerPoints;
-    this.#onDataChange = onDataChange;
-    this.#onModeChange = onModeChange;
+    this.#handlePointChange = onPointChange;
+    this.#handleModeChange = onModeChange;
     this.#offersModel = offersModel;
     this.#pointsModel = pointsModel;
     this.#destinationsModel = destinationsModel;
@@ -42,8 +42,8 @@ export default class PointPresenter {
         point: this.#point,
         offers: this.#offersModel.getByType(point.type) ?? OFFER_EMPTY,
         destination: this.#destinationsModel.getById(point.destination),
-        onEditButtonClick: this.#onEditButtonClick,
-        onFavoriteButtonClick: this.#onFavoriteButtonClick
+        onEditButtonClick: this.#editButtonClickHandler,
+        onFavoriteButtonClick: this.#favoriteButtonClickHandler
       }
     );
 
@@ -53,8 +53,8 @@ export default class PointPresenter {
         offers: this.#offersModel.offers,
         destinations: this.#destinationsModel.destinations,
         allTypesPoints: this.#getTypesOfAllPoints(),
-        onSaveButtonClick: this.#onSaveButtonClick,
-        onResetButtonClick: this.#onResetButtonClick
+        onSaveButtonClick: this.#saveButtonClickHandler,
+        onResetButtonClick: this.#resetButtonClickHandler
       }
     );
 
@@ -95,35 +95,37 @@ export default class PointPresenter {
 
   #replacePointToFormEdit() {
     replace(this.#formEditComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#onEscapeKeyDown);
-    this.#onModeChange();
+    document.addEventListener('keydown', this.#escapeKeyDownHandler);
+    this.#handleModeChange();
     this.#mode = Mode.EDITING;
   }
 
   #replaceFormEditToPoint() {
     replace(this.#pointComponent, this.#formEditComponent);
-    document.removeEventListener('keydown', this.#onEscapeKeyDown);
+    document.removeEventListener('keydown', this.#escapeKeyDownHandler);
     this.#mode = Mode.DEFAULT;
   }
 
-  #onEditButtonClick = () => {
+  #editButtonClickHandler = () => {
     this.#replacePointToFormEdit();
   };
 
-  #onSaveButtonClick = () => {
+  #saveButtonClickHandler = (updatedPoint) => {
+    console.log(updatedPoint)
+    this.#handlePointChange(updatedPoint);
     this.#replaceFormEditToPoint();
   };
 
-  #onResetButtonClick = () => {
+  #resetButtonClickHandler = () => {
     this.#formEditComponent.reset(this.#point);
     this.#replaceFormEditToPoint();
   };
 
-  #onFavoriteButtonClick = () => {
-    this.#onDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
+  #favoriteButtonClickHandler = () => {
+    this.#handlePointChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
   };
 
-  #onEscapeKeyDown = (evt) => {
+  #escapeKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       this.#formEditComponent.reset(this.#point);
