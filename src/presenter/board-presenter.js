@@ -2,61 +2,50 @@ import { RenderPosition, render } from '../framework/render';
 import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
-import { OFFER_EMPTY } from '../const';
 import PointPresenter from './point-presenter';
 import { updateItem } from '../utils/common';
-import { SortType } from '../const';
+import { SortType, enabledSortType } from '../const';
 import { sortPointsByTime, sortPointsByPrice } from '../utils/common';
 
 const tripEvents = document.querySelector('.trip-events');
-
 export default class PointsPresenter {
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
-  #pointsListComponent = new ListView();
   #sortComponent = null;
+
+  #pointsListComponent = new ListView();
   #noPointsComponent = new NoPointsView();
-  #currentSortType = SortType.DAY;
-  #sourcedPoints = [];
 
-  #points = [];
   #pointPresenters = new Map();
+  #sourcedPoints = [];
+  #points = [];
+  #currentSortType = SortType.DEFAULT;
 
-  constructor(pointsModel, offersModel, destinationsModel) {
+  constructor({pointsModel, offersModel, destinationsModel}) {
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+
+    this.#points = [...this.#pointsModel.points];
+    this.#sourcedPoints = [...this.#pointsModel.points];
   }
 
   init() {
-    this.#points = [...this.#pointsModel.points];
-    this.offers = [...this.#offersModel.offers];
-    this.destinations = [...this.#destinationsModel.destinations];
-
-    this.#sourcedPoints = [...this.#pointsModel.points];
-    this.#renderPointsList();
+    this.#renderBoard();
   }
 
-  #onPointChange = (updatedPoint) => {
+  #pointChangeHandler = (updatedPoint) => {
     this.#points = updateItem(this.#points, updatedPoint);
     this.#sourcedPoints = updateItem(this.#sourcedPoints, updatedPoint);
-    this.#pointPresenters.get(updatedPoint.id).init(
-      {
-        point: updatedPoint,
-        offersByType: this.#offersModel.getByType(updatedPoint.type) ?? OFFER_EMPTY,
-        destination: this.#destinationsModel.getById(updatedPoint.destination),
-        allOffers: this.offers,
-        allDestinations: this.destinations
-      }
-    );
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
 
-  #onModeChange = () => {
+  #modeChangeHandler = () => {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #onSortChange = (sortType) => {
+  #sortChangeHandler = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
     }
@@ -85,42 +74,46 @@ export default class PointsPresenter {
   }
 
   #renderSort() {
+    const sortItems = this.#generateSort();
+
     this.#sortComponent = new SortView({
-      onSortChange: this.#onSortChange
+      sortItems: sortItems,
+      onSortChange: this.#sortChangeHandler
     });
+
     render(this.#sortComponent, this.#pointsListComponent.element, RenderPosition.AFTERBEGIN);
+  }
+
+  #generateSort() {
+    return Object.values(SortType).map(
+      (type) => ({
+        type,
+        isChecked: (type === this.#currentSortType),
+        isDisabled: !enabledSortType[type]
+      }),
+    );
   }
 
   #renderPoints() {
     this.#points.forEach((point) => {
-
-      const offersByType = this.#offersModel.getByType(point.type) ?? OFFER_EMPTY;
-      const destination = this.#destinationsModel.getById(point.destination);
-
-      this.#renderPoint(point, offersByType, destination);
+      this.#renderPoint(point);
     });
   }
 
-  #renderPoint(point, offersByType, destination) {
+  #renderPoint(point) {
 
     const pointPresenter = new PointPresenter(
       {
         containerPoints: this.#pointsListComponent.element,
-        onDataChange: this.#onPointChange,
-        onModeChange: this.#onModeChange,
-        allPoints: this.#points
+        offersModel: this.#offersModel,
+        destinationsModel: this.#destinationsModel,
+        pointsModel: this.#pointsModel,
+        onPointChange: this.#pointChangeHandler,
+        onModeChange: this.#modeChangeHandler,
       }
     );
 
-    pointPresenter.init(
-      {
-        point,
-        offersByType,
-        destination,
-        allOffers: this.offers,
-        allDestinations: this.destinations
-      }
-    );
+    pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
@@ -129,13 +122,13 @@ export default class PointsPresenter {
     this.#pointPresenters.clear();
   }
 
-  #renderPointsList() {
-    render(this.#pointsListComponent, tripEvents);
-
+  #renderBoard() {
     if (this.#points.length === 0) {
       this.#renderNoPoints();
       return;
     }
+
+    render(this.#pointsListComponent, tripEvents);
 
     this.#renderSort();
     this.#renderPoints();

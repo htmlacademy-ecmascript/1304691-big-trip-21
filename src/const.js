@@ -36,6 +36,14 @@ const SortType = {
   OFFER: 'offer'
 };
 
+const enabledSortType = {
+  [SortType.DEFAULT]: true,
+  [SortType.EVENT]: false,
+  [SortType.TIME]: true,
+  [SortType.PRICE]: true,
+  [SortType.OFFER]: false,
+};
+
 export {
   DATE_TIME_FORMAT,
   FULL_DATE_TIME_FORMAT,
@@ -44,6 +52,7 @@ export {
   POINT_EMPTY,
   OFFER_EMPTY,
   FilterType,
-  SortType
+  SortType,
+  enabledSortType
 };
 

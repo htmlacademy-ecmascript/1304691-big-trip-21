@@ -1,4 +1,4 @@
-import PointsPresenter from './presenter/points-presenter';
+import PointsPresenter from './presenter/board-presenter';
 import HeaderPresenter from './presenter/header-presenter';
 
 import PointsModel from './model/points-model';
@@ -13,7 +13,7 @@ const pointsModel = new PointsModel(service);
 const offersModel = new OffersModel(service);
 const destinationsModel = new DestinationsModel(service);
 
-const pointsPresenter = new PointsPresenter(pointsModel, offersModel, destinationsModel);
+const pointsPresenter = new PointsPresenter({pointsModel, offersModel, destinationsModel});
 
 const headerPresenter = new HeaderPresenter(pointsModel);
 

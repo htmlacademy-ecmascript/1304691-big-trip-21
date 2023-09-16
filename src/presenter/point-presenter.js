@@ -1,30 +1,36 @@
 import { render, replace, remove } from '../framework/render';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
+import { OFFER_EMPTY } from '../const';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING'
 };
+
 export default class PointPresenter {
   #containerPoints = null;
   #pointComponent = null;
   #formEditComponent = null;
-  #onDataChange = null;
-  #onModeChange = null;
+  #handlePointChange = null;
+  #handleModeChange = null;
   #point = null;
   #mode = Mode.DEFAULT;
-  #allPoints = null;
+  #offersModel = null;
+  #destinationsModel = null;
+  #pointsModel = null;
   #allTypesPoints = new Set();
 
-  constructor({ containerPoints, onDataChange, onModeChange, allPoints }) {
+  constructor({ containerPoints, offersModel, destinationsModel, onPointChange, pointsModel, onModeChange }) {
     this.#containerPoints = containerPoints;
-    this.#onDataChange = onDataChange;
-    this.#onModeChange = onModeChange;
-    this.#allPoints = allPoints;
+    this.#handlePointChange = onPointChange;
+    this.#handleModeChange = onModeChange;
+    this.#offersModel = offersModel;
+    this.#pointsModel = pointsModel;
+    this.#destinationsModel = destinationsModel;
   }
 
-  init({ point, offersByType, destination, allOffers, allDestinations }) {
+  init(point) {
 
     this.#point = point;
 
@@ -34,20 +40,21 @@ export default class PointPresenter {
     this.#pointComponent = new PointView(
       {
         point: this.#point,
-        offers: offersByType,
-        destination: destination,
-        onEditButtonClick: this.#onEditButtonClick,
-        onFavoriteButtonClick: this.#onFavoriteButtonClick
+        offers: this.#offersModel.getByType(point.type) ?? OFFER_EMPTY,
+        destination: this.#destinationsModel.getById(point.destination),
+        onEditButtonClick: this.#editButtonClickHandler,
+        onFavoriteButtonClick: this.#favoriteButtonClickHandler
       }
     );
 
     this.#formEditComponent = new FormEditView(
       {
         point: this.#point,
-        offers: allOffers,
-        destinations: allDestinations,
+        offers: this.#offersModel.offers,
+        destinations: this.#destinationsModel.destinations,
         allTypesPoints: this.#getTypesOfAllPoints(),
-        onSaveButtonClick: this.#onSaveButtonClick
+        onSaveButtonClick: this.#saveButtonClickHandler,
+        onResetButtonClick: this.#resetButtonClickHandler
       }
     );
 
@@ -70,7 +77,7 @@ export default class PointPresenter {
   }
 
   #getTypesOfAllPoints() {
-    this.#allPoints.forEach((points) => this.#allTypesPoints.add(points.type));
+    this.#pointsModel.points.forEach((points) => this.#allTypesPoints.add(points.type));
     return this.#allTypesPoints;
   }
 
@@ -88,30 +95,36 @@ export default class PointPresenter {
 
   #replacePointToFormEdit() {
     replace(this.#formEditComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#onEscapeKeyDown);
-    this.#onModeChange();
+    document.addEventListener('keydown', this.#escapeKeyDownHandler);
+    this.#handleModeChange();
     this.#mode = Mode.EDITING;
   }
 
   #replaceFormEditToPoint() {
     replace(this.#pointComponent, this.#formEditComponent);
-    document.removeEventListener('keydown', this.#onEscapeKeyDown);
+    document.removeEventListener('keydown', this.#escapeKeyDownHandler);
     this.#mode = Mode.DEFAULT;
   }
 
-  #onEditButtonClick = () => {
+  #editButtonClickHandler = () => {
     this.#replacePointToFormEdit();
   };
 
-  #onSaveButtonClick = () => {
+  #saveButtonClickHandler = (updatedPoint) => {
+    this.#handlePointChange({ ...this.point, ...updatedPoint });
     this.#replaceFormEditToPoint();
   };
 
-  #onFavoriteButtonClick = () => {
-    this.#onDataChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
+  #resetButtonClickHandler = () => {
+    this.#formEditComponent.reset(this.#point);
+    this.#replaceFormEditToPoint();
   };
 
-  #onEscapeKeyDown = (evt) => {
+  #favoriteButtonClickHandler = () => {
+    this.#handlePointChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
+  };
+
+  #escapeKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       this.#formEditComponent.reset(this.#point);

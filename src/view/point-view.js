@@ -65,7 +65,7 @@ function createPointTemplate(point, offersByType, destination) {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${destination.name ? destination.name : ''}</h3>
+        <h3 class="event__title">${type} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="2019-03-18T10:30">${dateStartFormat}</time>
@@ -96,35 +96,36 @@ export default class PointView extends AbstractView {
   #point = null;
   #offers = null;
   #destination = null;
-  #onEditButtonClick = null;
-  #onFavoriteButtonClick = null;
+  #handleEditButtonClick = null;
+  #handleFavoriteButtonClick = null;
 
   constructor({ point, offers, destination, onEditButtonClick, onFavoriteButtonClick }) {
     super();
     this.#point = point;
     this.#offers = offers;
     this.#destination = destination;
-    this.#onEditButtonClick = onEditButtonClick;
-    this.#onFavoriteButtonClick = onFavoriteButtonClick;
+
+    this.#handleEditButtonClick = onEditButtonClick;
+    this.#handleFavoriteButtonClick = onFavoriteButtonClick;
 
     this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#onEditFormClick);
+      .addEventListener('click', this.#editButtonClickHandler);
 
     this.element.querySelector('.event__favorite-btn')
-      .addEventListener('click', this.#onFavoriteFormClick);
+      .addEventListener('click', this.#favoriteButtonClickHandler);
   }
 
   get template() {
     return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  #onEditFormClick = (evt) => {
+  #editButtonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#onEditButtonClick();
+    this.#handleEditButtonClick();
   };
 
-  #onFavoriteFormClick = (evt) => {
+  #favoriteButtonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#onFavoriteButtonClick();
+    this.#handleFavoriteButtonClick();
   };
 }
