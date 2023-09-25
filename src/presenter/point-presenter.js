@@ -1,7 +1,7 @@
 import { render, replace, remove } from '../framework/render';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
-import { OFFER_EMPTY } from '../const';
+import { OFFER_EMPTY, UserAction, UpdateType } from '../const';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -111,7 +111,10 @@ export default class PointPresenter {
   };
 
   #saveButtonClickHandler = (updatedPoint) => {
-    this.#handlePointChange({ ...this.point, ...updatedPoint });
+    this.#handlePointChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      { ...this.point, ...updatedPoint });
     this.#replaceFormEditToPoint();
   };
 
@@ -121,7 +124,11 @@ export default class PointPresenter {
   };
 
   #favoriteButtonClickHandler = () => {
-    this.#handlePointChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
+    this.#handlePointChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      { ...this.#point, isFavorite: !this.#point.isFavorite }
+    );
   };
 
   #escapeKeyDownHandler = (evt) => {

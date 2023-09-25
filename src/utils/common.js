@@ -28,10 +28,6 @@ function getRandomInteger(min, max) {
   return Math.floor(result);
 }
 
-function updateItem(items, update) {
-  return items.map((item) => item.id === update.id ? update : item);
-}
-
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -72,7 +68,6 @@ export {
   getRandomArrayElement,
   getRandomInteger,
   humanizePointDate,
-  updateItem,
   capitalizeFirstLetter,
   getDifference,
   sortPointsByTime,

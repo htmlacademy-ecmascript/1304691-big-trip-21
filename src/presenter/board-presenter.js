@@ -23,6 +23,8 @@ export default class PointsPresenter {
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+
+    this.#pointsModel.addObserver(this.#modelEventHandler);
   }
 
   init() {
@@ -41,9 +43,21 @@ export default class PointsPresenter {
     return this.#pointsModel.points;
   }
 
-  #pointChangeHandler = (updatedPoint) => {
+  #viewActionHandler = (actionType, updateType, update) => {
+    console.log(actionType, updateType, update);
     // Здесь будем вызывать обновление модели
-    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+  };
+
+  #modelEventHandler = (updateType, data) => {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
   };
 
   #modeChangeHandler = () => {
@@ -95,7 +109,7 @@ export default class PointsPresenter {
         offersModel: this.#offersModel,
         destinationsModel: this.#destinationsModel,
         pointsModel: this.#pointsModel,
-        onPointChange: this.#pointChangeHandler,
+        onPointChange: this.#viewActionHandler,
         onModeChange: this.#modeChangeHandler,
       }
     );
