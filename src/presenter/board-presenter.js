@@ -3,7 +3,7 @@ import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
 import PointPresenter from './point-presenter';
-import { SortType, enabledSortType } from '../const';
+import { SortType, enabledSortType, UpdateType, UserAction } from '../const';
 import { sortPointsByTime, sortPointsByPrice } from '../utils/common';
 
 const tripEvents = document.querySelector('.trip-events');
@@ -44,20 +44,27 @@ export default class PointsPresenter {
   }
 
   #viewActionHandler = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
-    // Здесь будем вызывать обновление модели
-
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        return this.#pointsModel.updatePoint(updateType, update);
+      case UserAction.ADD_POINT:
+        return this.#pointsModel.addPoint(updateType, update);
+      case UserAction.DELETE_POINT:
+        return this.#pointsModel(updateType, update);
+    }
   };
 
   #modelEventHandler = (updateType, data) => {
     console.log(updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+
+    switch (updateType) {
+      case UpdateType.PATCH:
+        return this.#pointPresenters.get(data.id).init(data);
+      case UpdateType.MINOR:
+      // - обновить список (например, когда задача ушла в архив)
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+    }
   };
 
   #modeChangeHandler = () => {
