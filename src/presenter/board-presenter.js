@@ -1,4 +1,4 @@
-import { RenderPosition, render } from '../framework/render';
+import { RenderPosition, render, remove } from '../framework/render';
 import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
@@ -7,7 +7,7 @@ import { SortType, enabledSortType, UpdateType, UserAction } from '../const';
 import { sortPointsByTime, sortPointsByPrice } from '../utils/common';
 
 const tripEvents = document.querySelector('.trip-events');
-export default class PointsPresenter {
+export default class BoardPresenter {
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
@@ -19,7 +19,7 @@ export default class PointsPresenter {
   #pointPresenters = new Map();
   #currentSortType = SortType.DEFAULT;
 
-  constructor({pointsModel, offersModel, destinationsModel}) {
+  constructor({ pointsModel, offersModel, destinationsModel }) {
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
@@ -55,15 +55,17 @@ export default class PointsPresenter {
   };
 
   #modelEventHandler = (updateType, data) => {
-    console.log(updateType, data);
-
     switch (updateType) {
       case UpdateType.PATCH:
         return this.#pointPresenters.get(data.id).init(data);
       case UpdateType.MINOR:
-      // - обновить список (например, когда задача ушла в архив)
+        this.#clearBoard();
+        this.#renderBoard();
+        break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
+        this.#clearBoard();
+        this.#renderBoard();
+        break;
     }
   };
 
@@ -77,8 +79,8 @@ export default class PointsPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#clearPointsList();
-    this.#renderPointsList();
+    this.#clearBoard();
+    this.#renderBoard();
   };
 
   #renderSort() {
@@ -125,14 +127,13 @@ export default class PointsPresenter {
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
-  #clearPointsList() {
+  #clearBoard() {
+
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
-  }
 
-  #renderPointsList() {
-    render(this.#pointsListComponent, tripEvents);
-    this.#renderPoints(this.points);
+    remove(this.#sortComponent);
+    remove(this.#noPointsComponent);
   }
 
   #renderBoard() {
@@ -142,7 +143,8 @@ export default class PointsPresenter {
     }
 
     this.#renderSort();
-    this.#renderPointsList();
+    render(this.#pointsListComponent, tripEvents);
+    this.#renderPoints(this.points);
   }
 
   #renderNoPoints() {
