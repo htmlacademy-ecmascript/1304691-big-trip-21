@@ -3,6 +3,7 @@ import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
 import PointPresenter from './point-presenter';
+import { filter } from '../utils/filter.js';
 import { SortType, enabledSortType, UpdateType, UserAction } from '../const';
 import { sortPointsByTime, sortPointsByPrice, sortPointsByDay } from '../utils/common';
 
@@ -11,20 +12,24 @@ export default class BoardPresenter {
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
-  #sortComponent = null;
+  #filterModel = null;
 
+  #sortComponent = null;
   #pointsListComponent = new ListView();
   #noPointsComponent = new NoPointsView();
 
   #pointPresenters = new Map();
+
   #currentSortType = SortType.DEFAULT;
 
-  constructor({ pointsModel, offersModel, destinationsModel }) {
+  constructor({ pointsModel, offersModel, destinationsModel, filterModel }) {
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+    this.#filterModel = filterModel;
 
     this.#pointsModel.addObserver(this.#modelEventHandler);
+    this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
   init() {
@@ -33,16 +38,20 @@ export default class BoardPresenter {
 
   get points() {
 
+    const filterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[filterType](points);
+
     switch (this.#currentSortType) {
       case SortType.TIME:
-        return [...this.#pointsModel.points].sort(sortPointsByTime);
+        return filteredPoints.sort(sortPointsByTime);
       case SortType.PRICE:
-        return [...this.#pointsModel.points].sort(sortPointsByPrice);
+        return filteredPoints.sort(sortPointsByPrice);
       case SortType.DEFAULT:
-        return [...this.#pointsModel.points].sort(sortPointsByDay);
+        return filteredPoints.sort(sortPointsByDay);
     }
 
-    return this.#pointsModel.points;
+    return this.filteredPoints;
   }
 
   #viewActionHandler = (actionType, updateType, update) => {

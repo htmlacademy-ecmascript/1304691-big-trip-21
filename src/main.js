@@ -15,7 +15,7 @@ const offersModel = new OffersModel(service);
 const destinationsModel = new DestinationsModel(service);
 const filterModel = new FilterModel();
 
-const pointsPresenter = new PointsPresenter({pointsModel, offersModel, destinationsModel});
+const pointsPresenter = new PointsPresenter({ pointsModel, offersModel, destinationsModel, filterModel });
 
 const headerPresenter = new HeaderPresenter(pointsModel, filterModel);
 
