@@ -19,7 +19,7 @@ const pointsPresenter = new PointsPresenter({pointsModel, offersModel, destinati
 
 const headerPresenter = new HeaderPresenter(pointsModel, filterModel);
 
-pointsPresenter.init();
 headerPresenter.init();
+pointsPresenter.init();
 
 

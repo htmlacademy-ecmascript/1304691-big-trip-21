@@ -1,50 +1,78 @@
-import { RenderPosition, render } from '../framework/render';
+import { RenderPosition, render, remove, replace } from '../framework/render';
 import FilterView from '../view/filters-view';
 import InfoView from '../view/info-view';
-import { Filters } from '../utils/filter';
+import { filter } from '../utils/filter';
+import { UpdateType } from '../const';
 
 const tripMainEvents = document.querySelector('.trip-main');
 const tripFilters = document.querySelector('.trip-controls__filters');
 
 export default class HeaderPresenter {
-  #points = null;
   #filterComponent = null;
+
+  #pointsModel = null;
   #filterModel = null;
 
   constructor(pointsModel, filterModel) {
-    this.#points = pointsModel.points;
+    this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+
+    this.#pointsModel.addObserver(this.#modelEventHandler);
+    this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
   init() {
 
-    if (this.#points.length !== 0) {
+    if (this.#pointsModel.points.length !== 0) {
       render(new InfoView(), tripMainEvents, RenderPosition.AFTERBEGIN);
     }
 
-    this.#renderFilter();
+    this.#initFilter();
 
   }
 
-  #renderFilter() {
-    const filterItems = this.#generateFilter(this.#points);
+  #initFilter() {
+    const filters = this.filters;
+    const prevFilterComponent = this.#filterComponent;
 
     this.#filterComponent = new FilterView({
-      filterItems,
-      onFilterTypeChange: () => {}
+      filters,
+      onFilterTypeChange: this.#filterTypeChangeHandler
     });
 
-    render(this.#filterComponent, tripFilters);
+    if (prevFilterComponent === null) {
+      render(this.#filterComponent, tripFilters);
+      return;
+    }
+
+    replace(this.#filterComponent, prevFilterComponent);
+
+    remove(prevFilterComponent);
   }
 
-  #generateFilter(points) {
-    return Object.entries(Filters).map(
-      ([filterType, filterPoints], index) => ({
+  get filters() {
+    const points = this.#pointsModel.points;
+
+    return Object.entries(filter).map(
+      ([filterType, filterPoints]) => ({
         type: filterType,
-        isChecked: index === 0,
+        isChecked: filterType === this.#filterModel.filter,
         isDisabled: filterPoints(points).length === 0,
       }),
     );
   }
+
+  #modelEventHandler = () => {
+    this.#initFilter();
+  };
+
+
+  #filterTypeChangeHandler = (filterType) => {
+    if (this.#filterModel.filter === filterType) {
+      return;
+    }
+
+    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+  };
 
 }
