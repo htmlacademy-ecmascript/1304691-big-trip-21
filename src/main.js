@@ -17,7 +17,7 @@ const filterModel = new FilterModel();
 
 const pointsPresenter = new PointsPresenter({pointsModel, offersModel, destinationsModel});
 
-const headerPresenter = new HeaderPresenter(pointsModel);
+const headerPresenter = new HeaderPresenter(pointsModel, filterModel);
 
 pointsPresenter.init();
 headerPresenter.init();

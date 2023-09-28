@@ -9,9 +9,11 @@ const tripFilters = document.querySelector('.trip-controls__filters');
 export default class HeaderPresenter {
   #points = null;
   #filterComponent = null;
+  #filterModel = null;
 
-  constructor(pointsModel) {
+  constructor(pointsModel, filterModel) {
     this.#points = pointsModel.points;
+    this.#filterModel = filterModel;
   }
 
   init() {
@@ -28,7 +30,8 @@ export default class HeaderPresenter {
     const filterItems = this.#generateFilter(this.#points);
 
     this.#filterComponent = new FilterView({
-      filterItems: filterItems,
+      filterItems,
+      onFilterTypeChange: () => {}
     });
 
     render(this.#filterComponent, tripFilters);

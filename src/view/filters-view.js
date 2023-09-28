@@ -1,6 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-
 function createFilterItem({ type, isChecked, isDisabled }) {
 
   return `
@@ -23,14 +22,21 @@ function createFilterTemplate(items) {
 
 export default class FiltersView extends AbstractView {
   #items = null;
+  #handleFilterTypeChange = null;
 
-  constructor({ filterItems }) {
+  constructor({ filterItems, onFilterTypeChange }) {
     super();
 
     this.#items = filterItems;
+    this.#handleFilterTypeChange = onFilterTypeChange;
   }
 
   get template() {
     return createFilterTemplate(this.#items);
   }
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFilterTypeChange(evt.target.value);
+  };
 }
