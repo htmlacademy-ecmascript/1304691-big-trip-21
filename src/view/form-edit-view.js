@@ -154,8 +154,9 @@ export default class FormEditView extends AbstractStatefulView {
   #allTypesPoints = null;
   #datePickerFrom = null;
   #datePickerTo = null;
+  #handleDeleteClick = null;
 
-  constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick, onResetButtonClick }) {
+  constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick, onResetButtonClick, onDeleteClick }) {
     super();
     this._setState(FormEditView.parsePointToState({ point }));
 
@@ -164,6 +165,7 @@ export default class FormEditView extends AbstractStatefulView {
     this.#allTypesPoints = allTypesPoints;
     this.#handleFormSave = onSaveButtonClick;
     this.#handleFormClose = onResetButtonClick;
+    this.#handleDeleteClick = onDeleteClick;
 
     this._restoreHandlers();
   }
@@ -210,12 +212,21 @@ export default class FormEditView extends AbstractStatefulView {
     this.element.querySelector('.event__input--price')
       .addEventListener('change', this.#priceChangeHandler);
 
+    this.element.querySelector('.event__reset-btn')
+      .addEventListener('click', this.#formDeleteClickHandler);
+
     this.#setDatePickers();
   }
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSave(FormEditView.parseStateToPoint(this._state));
+  };
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+
+    this.#handleDeleteClick(FormEditView.parseStateToPoint(this._state));
   };
 
   #dateFromCloseHandler = ([userDate]) => {

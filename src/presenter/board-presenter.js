@@ -52,7 +52,7 @@ export default class BoardPresenter {
       case UserAction.ADD_POINT:
         return this.#pointsModel.addPoint(updateType, update);
       case UserAction.DELETE_POINT:
-        return this.#pointsModel(updateType, update);
+        return this.#pointsModel.deletePoint(updateType, update);
     }
   };
 
@@ -65,7 +65,7 @@ export default class BoardPresenter {
         this.#renderBoard();
         break;
       case UpdateType.MAJOR:
-        this.#clearBoard();
+        this.#clearBoard({ resetSortType: true });
         this.#renderBoard();
         break;
     }
@@ -129,12 +129,16 @@ export default class BoardPresenter {
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
-  #clearBoard() {
+  #clearBoard({ resetSortType = false } = {}) {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
 
     remove(this.#sortComponent);
     remove(this.#noPointsComponent);
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
   }
 
   #renderBoard() {

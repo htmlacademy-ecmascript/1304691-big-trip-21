@@ -65,7 +65,11 @@ function sortPointsByPrice(pointA, pointB) {
 }
 
 function sortPointsByDay(pointA, pointB) {
-  return dayjs(pointB.dateFrom) - dayjs(pointA.dateFrom);
+  return dayjs(pointA.dateFrom) - dayjs(pointB.dateFrom);
+}
+
+function isDatesEqual(dateA, dateB) {
+  return dayjs(dateA).isSame(dateB, 'D');
 }
 
 export {
@@ -77,5 +81,6 @@ export {
   sortPointsByTime,
   sortPointsByPrice,
   sortPointsByDay,
+  isDatesEqual,
   capitalizeFirstLetterToLower
 };
