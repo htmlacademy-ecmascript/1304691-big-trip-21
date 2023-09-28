@@ -4,7 +4,7 @@ import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
 import PointPresenter from './point-presenter';
 import { SortType, enabledSortType, UpdateType, UserAction } from '../const';
-import { sortPointsByTime, sortPointsByPrice } from '../utils/common';
+import { sortPointsByTime, sortPointsByPrice, sortPointsByDay } from '../utils/common';
 
 const tripEvents = document.querySelector('.trip-events');
 export default class BoardPresenter {
@@ -38,6 +38,8 @@ export default class BoardPresenter {
         return [...this.#pointsModel.points].sort(sortPointsByTime);
       case SortType.PRICE:
         return [...this.#pointsModel.points].sort(sortPointsByPrice);
+      case SortType.DEFAULT:
+        return [...this.#pointsModel.points].sort(sortPointsByDay);
     }
 
     return this.#pointsModel.points;
@@ -128,7 +130,6 @@ export default class BoardPresenter {
   }
 
   #clearBoard() {
-
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
 
@@ -137,13 +138,14 @@ export default class BoardPresenter {
   }
 
   #renderBoard() {
+    render(this.#pointsListComponent, tripEvents);
+
     if (this.points.length === 0) {
       this.#renderNoPoints();
       return;
     }
 
     this.#renderSort();
-    render(this.#pointsListComponent, tripEvents);
     this.#renderPoints(this.points);
   }
 

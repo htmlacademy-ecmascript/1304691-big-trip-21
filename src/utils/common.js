@@ -64,6 +64,10 @@ function sortPointsByPrice(pointA, pointB) {
   return pointB.basePrice - pointA.basePrice;
 }
 
+function sortPointsByDay(pointA, pointB) {
+  return dayjs(pointB.dateFrom) - dayjs(pointA.dateFrom);
+}
+
 export {
   getRandomArrayElement,
   getRandomInteger,
@@ -72,5 +76,6 @@ export {
   getDifference,
   sortPointsByTime,
   sortPointsByPrice,
+  sortPointsByDay,
   capitalizeFirstLetterToLower
 };

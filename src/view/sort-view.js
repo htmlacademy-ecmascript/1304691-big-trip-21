@@ -1,4 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { SortType } from '../const.js';
 import { capitalizeFirstLetter } from '../utils/common.js';
 
 function createSortItem({type, isChecked, isDisabled}) {
@@ -50,20 +51,13 @@ export default class SortView extends AbstractView {
     evt.preventDefault();
 
     const currentTypeElement = evt.target;
-    const currentTypeItemElement = currentTypeElement.closest('.trip-sort__item');
-    const currentInput = currentTypeItemElement.querySelector('.trip-sort__input');
 
-    this.#handleSortChange(currentTypeElement.dataset.sortType);
-    this.#setAttributeSort(currentInput);
-  };
-
-  #setAttributeSort(currentInput) {
-    currentInput.removeAttribute('checked');
-    if (currentInput.hasAttribute('checked') || currentInput.hasAttribute('disabled')) {
+    if (currentTypeElement.dataset.sortType === SortType.EVENT || currentTypeElement.dataset.sortType === SortType.OFFER) {
       return;
     }
-    currentInput.setAttribute('checked', 'checked');
-  }
+
+    this.#handleSortChange(currentTypeElement.dataset.sortType);
+  };
 
   get template() {
     return createSortTemplate(this.#items);
