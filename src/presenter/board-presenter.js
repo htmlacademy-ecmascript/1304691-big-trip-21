@@ -4,7 +4,7 @@ import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
 import PointPresenter from './point-presenter';
 import { filter } from '../utils/filter.js';
-import { SortType, enabledSortType, UpdateType, UserAction } from '../const';
+import { SortType, enabledSortType, UpdateType, UserAction, FilterType } from '../const';
 import { sortPointsByTime, sortPointsByPrice, sortPointsByDay } from '../utils/common';
 
 const tripEvents = document.querySelector('.trip-events');
@@ -16,11 +16,12 @@ export default class BoardPresenter {
 
   #sortComponent = null;
   #pointsListComponent = new ListView();
-  #noPointsComponent = new NoPointsView();
+  #noPointsComponent = null;
 
   #pointPresenters = new Map();
 
   #currentSortType = SortType.DEFAULT;
+  #filterType = FilterType.ALL;
 
   constructor({ pointsModel, offersModel, destinationsModel, filterModel }) {
     this.#pointsModel = pointsModel;
@@ -38,9 +39,9 @@ export default class BoardPresenter {
 
   get points() {
 
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const points = this.#pointsModel.points;
-    const filteredPoints = filter[filterType](points);
+    const filteredPoints = filter[this.#filterType](points);
 
     switch (this.#currentSortType) {
       case SortType.TIME:
@@ -148,6 +149,10 @@ export default class BoardPresenter {
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
     }
+
+    if (this.#noPointsComponent) {
+      remove(this.#noPointsComponent);
+    }
   }
 
   #renderBoard() {
@@ -163,6 +168,10 @@ export default class BoardPresenter {
   }
 
   #renderNoPoints() {
+    this.#noPointsComponent = new NoPointsView({
+      filterType: this.#filterType
+    });
+
     render(this.#noPointsComponent, this.#pointsListComponent.element);
   }
 
