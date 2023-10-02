@@ -43,19 +43,13 @@ function createDestinationImg(destination) {
   }
 }
 
-function createFormTemplate({ state, destinations, offers, allTypesPoints }) {
+function createFormTemplate({ isNewPoint, state, destinations, offers, allTypesPoints }) {
 
   const { dateFrom, dateTo, offers: offersId, basePrice, destination, type } = state.point;
 
-  if (state.point === POINT_EMPTY) {
-    destinations = state.destination;
-  }
-
   const destinationsList = createDestinationsList(destinations);
 
-  if (destinations) {
-    destinations = destinations.find((item) => item.id === destination);
-  }
+  destinations = destinations.find((item) => item.id === destination);
 
   const destinationPictures = createDestinationImg(destinations);
 
@@ -112,10 +106,7 @@ function createFormTemplate({ state, destinations, offers, allTypesPoints }) {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          ${state.point === POINT_EMPTY ? '<button class="event__reset-btn" type="reset">Cancel</button>' : `
-            <button class="event__reset-btn" type="reset">Delete</button>
-            <button class="event__rollup-btn" type="button"><span class="visually-hidden" > Open event</span></button >
-          ` }
+          ${isNewPoint ? '<button class="event__reset-btn" type="reset">Cancel</button>' : '<button class="event__reset-btn" type="reset">Delete</button><button class="event__rollup-btn" type="button"><span class="visually-hidden" > Open event</span></button>'}
         </header>
         <section class="event__details">
           ${offersList ? `
@@ -155,11 +146,13 @@ export default class FormEditView extends AbstractStatefulView {
   #datePickerFrom = null;
   #datePickerTo = null;
   #handleDeleteClick = null;
+  #isNewPoint = null;
 
-  constructor({ point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick, onResetButtonClick, onDeleteClick }) {
+  constructor({ isNewPoint, point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick, onResetButtonClick, onDeleteClick }) {
     super();
     this._setState(FormEditView.parsePointToState({ point }));
 
+    this.#isNewPoint = isNewPoint;
     this.#offers = offers;
     this.#destinations = destinations;
     this.#allTypesPoints = allTypesPoints;
@@ -172,6 +165,7 @@ export default class FormEditView extends AbstractStatefulView {
 
   get template() {
     return createFormTemplate({
+      isNewPoint: this.#isNewPoint,
       state: this._state,
       destinations: this.#destinations,
       offers: this.#offers,
@@ -198,7 +192,7 @@ export default class FormEditView extends AbstractStatefulView {
       .addEventListener('submit', this.#formSaveHandler);
 
     this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#resetClickHandler);
+      ?.addEventListener('click', this.#resetClickHandler);
 
     this.element.querySelector('.event__type-group')
       .addEventListener('change', this.#typeChangeHandler);

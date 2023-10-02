@@ -1,11 +1,8 @@
-import { RenderPosition, render, remove, replace } from '../framework/render';
+import { render, remove, replace } from '../framework/render';
 import FilterView from '../view/filters-view';
 import InfoView from '../view/info-view';
 import { filter } from '../utils/filter';
 import { UpdateType } from '../const';
-
-const tripMainEvents = document.querySelector('.trip-main');
-const tripFilters = document.querySelector('.trip-controls__filters');
 
 export default class HeaderPresenter {
   #filterComponent = null;
@@ -13,9 +10,17 @@ export default class HeaderPresenter {
   #pointsModel = null;
   #filterModel = null;
 
-  constructor(pointsModel, filterModel) {
+  #tripMainEventsContainer = null;
+
+  #newPointButtonComponent = null;
+
+  constructor({ pointsModel, filterModel, tripMainEventsContainer, newPointButtonComponent }) {
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+
+    this.#tripMainEventsContainer = tripMainEventsContainer;
+
+    this.#newPointButtonComponent = newPointButtonComponent;
 
     this.#pointsModel.addObserver(this.#modelEventHandler);
     this.#filterModel.addObserver(this.#modelEventHandler);
@@ -24,11 +29,11 @@ export default class HeaderPresenter {
   init() {
 
     if (this.#pointsModel.points.length !== 0) {
-      render(new InfoView(), tripMainEvents, RenderPosition.AFTERBEGIN);
+      render(new InfoView(), this.#tripMainEventsContainer);
     }
 
     this.#initFilter();
-
+    this.#renderNewPointButton();
   }
 
   #initFilter() {
@@ -41,7 +46,7 @@ export default class HeaderPresenter {
     });
 
     if (prevFilterComponent === null) {
-      render(this.#filterComponent, tripFilters);
+      render(this.#filterComponent, this.#tripMainEventsContainer);
       return;
     }
 
@@ -74,5 +79,9 @@ export default class HeaderPresenter {
 
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
+
+  #renderNewPointButton() {
+    render(this.#newPointButtonComponent, this.#tripMainEventsContainer);
+  }
 
 }

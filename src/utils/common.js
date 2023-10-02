@@ -3,6 +3,10 @@ import Duration from 'dayjs/plugin/duration';
 
 dayjs.extend(Duration);
 
+function isEscapeKey(evt) {
+  return evt.key === 'Escape' || evt.key === 'Esc';
+}
+
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
@@ -73,6 +77,7 @@ function isDatesEqual(dateA, dateB) {
 }
 
 export {
+  isEscapeKey,
   getRandomArrayElement,
   getRandomInteger,
   humanizePointDate,

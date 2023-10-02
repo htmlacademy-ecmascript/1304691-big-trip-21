@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
 import { OFFER_EMPTY, UserAction, UpdateType } from '../const';
-import { isDatesEqual } from '../utils/common';
+import { isDatesEqual, isEscapeKey } from '../utils/common';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -19,15 +19,14 @@ export default class PointPresenter {
   #mode = Mode.DEFAULT;
   #offersModel = null;
   #destinationsModel = null;
-  #pointsModel = null;
-  #allTypesPoints = new Set();
+  #allTypesPoints = null;
 
-  constructor({ containerPoints, offersModel, destinationsModel, onPointChange, pointsModel, onModeChange }) {
+  constructor({ containerPoints, offersModel, destinationsModel, onPointChange, allTypesPoints, onModeChange }) {
     this.#containerPoints = containerPoints;
     this.#handlePointChange = onPointChange;
     this.#handleModeChange = onModeChange;
     this.#offersModel = offersModel;
-    this.#pointsModel = pointsModel;
+    this.#allTypesPoints = allTypesPoints;
     this.#destinationsModel = destinationsModel;
   }
 
@@ -50,10 +49,11 @@ export default class PointPresenter {
 
     this.#formEditComponent = new FormEditView(
       {
+        isNewPoint: 'false',
         point: this.#point,
         offers: this.#offersModel.offers,
         destinations: this.#destinationsModel.destinations,
-        allTypesPoints: this.#getTypesOfAllPoints(),
+        allTypesPoints: this.#allTypesPoints,
         onSaveButtonClick: this.#saveButtonClickHandler,
         onResetButtonClick: this.#resetButtonClickHandler,
         onDeleteClick: this.#deleteButtonClickHandler
@@ -76,11 +76,6 @@ export default class PointPresenter {
     remove(prevPointComponent);
     remove(prevFormEditComponent);
 
-  }
-
-  #getTypesOfAllPoints() {
-    this.#pointsModel.points.forEach((points) => this.#allTypesPoints.add(points.type));
-    return this.#allTypesPoints;
   }
 
   resetView() {
@@ -147,7 +142,7 @@ export default class PointPresenter {
   };
 
   #escapeKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
+    if (isEscapeKey(evt)) {
       evt.preventDefault();
       this.#formEditComponent.reset(this.#point);
       this.#replaceFormEditToPoint();
