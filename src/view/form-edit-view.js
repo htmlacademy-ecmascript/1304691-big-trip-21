@@ -4,6 +4,7 @@ import { humanizePointDate, capitalizeFirstLetterToLower } from '../utils/common
 import { POINT_EMPTY } from '../const';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import he from 'he';
 
 function createTypelist([...types]) {
   return types.map((type) => `<div class="event__type-item">
@@ -85,7 +86,7 @@ function createFormTemplate({ isNewPoint, state, destinations, offers, allTypesP
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinations ? destinations.name : ''}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinations ? he.encode(destinations.name) : ''}" list="destination-list-1">
             ${destinations ? destinationsList : ''}
           </div>
 

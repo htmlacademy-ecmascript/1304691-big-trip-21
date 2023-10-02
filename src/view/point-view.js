@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import Duration from 'dayjs/plugin/duration';
 import { humanizePointDate } from '../utils/common';
 import { DATE_MONTH_FORMAT, DATE_TIME_FORMAT } from '../const';
+import he from 'he';
 
 const DAY_IN_MILLISECONDS = 86400000;
 const HOUR_IN_MILLISECONDS = 3600000;
@@ -65,7 +66,7 @@ function createPointTemplate(point, offersByType, destination) {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${destination.name}</h3>
+        <h3 class="event__title">${type} ${he.encode(destination.name)}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="2019-03-18T10:30">${dateStartFormat}</time>
