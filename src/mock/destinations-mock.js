@@ -31,4 +31,4 @@ function createDestination(index) {
   };
 }
 
-export { createDestination };
+export { createDestination, CITY_NAMES };

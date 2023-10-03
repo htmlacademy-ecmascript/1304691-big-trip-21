@@ -1,47 +1,87 @@
-import { RenderPosition, render } from '../framework/render';
+import { render, remove, replace } from '../framework/render';
 import FilterView from '../view/filters-view';
 import InfoView from '../view/info-view';
-import { Filters } from '../utils/filter';
-
-const tripMainEvents = document.querySelector('.trip-main');
-const tripFilters = document.querySelector('.trip-controls__filters');
+import { filter } from '../utils/filter';
+import { UpdateType } from '../const';
 
 export default class HeaderPresenter {
-  #points = null;
   #filterComponent = null;
 
-  constructor(pointsModel) {
-    this.#points = pointsModel.points;
+  #pointsModel = null;
+  #filterModel = null;
+
+  #tripMainEventsContainer = null;
+
+  #newPointButtonComponent = null;
+
+  constructor({ pointsModel, filterModel, tripMainEventsContainer, newPointButtonComponent }) {
+    this.#pointsModel = pointsModel;
+    this.#filterModel = filterModel;
+
+    this.#tripMainEventsContainer = tripMainEventsContainer;
+
+    this.#newPointButtonComponent = newPointButtonComponent;
+
+    this.#pointsModel.addObserver(this.#modelEventHandler);
+    this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
   init() {
 
-    if (this.#points.length !== 0) {
-      render(new InfoView(), tripMainEvents, RenderPosition.AFTERBEGIN);
+    if (this.#pointsModel.points.length !== 0) {
+      render(new InfoView(), this.#tripMainEventsContainer);
     }
 
-    this.#renderFilter();
-
+    this.#initFilter();
+    this.#renderNewPointButton();
   }
 
-  #renderFilter() {
-    const filterItems = this.#generateFilter(this.#points);
+  #initFilter() {
+    const filters = this.filters;
+    const prevFilterComponent = this.#filterComponent;
 
     this.#filterComponent = new FilterView({
-      filterItems: filterItems,
+      filters,
+      onFilterTypeChange: this.#filterTypeChangeHandler
     });
 
-    render(this.#filterComponent, tripFilters);
+    if (prevFilterComponent === null) {
+      render(this.#filterComponent, this.#tripMainEventsContainer);
+      return;
+    }
+
+    replace(this.#filterComponent, prevFilterComponent);
+
+    remove(prevFilterComponent);
   }
 
-  #generateFilter(points) {
-    return Object.entries(Filters).map(
-      ([filterType, filterPoints], index) => ({
+  get filters() {
+    const points = this.#pointsModel.points;
+
+    return Object.entries(filter).map(
+      ([filterType, filterPoints]) => ({
         type: filterType,
-        isChecked: index === 0,
+        isChecked: filterType === this.#filterModel.filter,
         isDisabled: filterPoints(points).length === 0,
       }),
     );
+  }
+
+  #modelEventHandler = () => {
+    this.#initFilter();
+  };
+
+
+  #filterTypeChangeHandler = (filterType) => {
+    if (this.#filterModel.filter === filterType) {
+      return;
+    }
+
+    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+  };
+
+  #renderNewPointButton() {
+    render(this.#newPointButtonComponent, this.#tripMainEventsContainer);
   }
 
 }

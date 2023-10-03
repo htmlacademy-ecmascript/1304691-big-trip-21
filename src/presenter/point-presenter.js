@@ -1,13 +1,13 @@
 import { render, replace, remove } from '../framework/render';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
-import { OFFER_EMPTY } from '../const';
+import { OFFER_EMPTY, UserAction, UpdateType } from '../const';
+import { isBigDifference, isEscapeKey } from '../utils/common';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING'
 };
-
 export default class PointPresenter {
   #containerPoints = null;
   #pointComponent = null;
@@ -18,15 +18,12 @@ export default class PointPresenter {
   #mode = Mode.DEFAULT;
   #offersModel = null;
   #destinationsModel = null;
-  #pointsModel = null;
-  #allTypesPoints = new Set();
 
-  constructor({ containerPoints, offersModel, destinationsModel, onPointChange, pointsModel, onModeChange }) {
+  constructor({ containerPoints, offersModel, destinationsModel, onPointChange, onModeChange }) {
     this.#containerPoints = containerPoints;
     this.#handlePointChange = onPointChange;
     this.#handleModeChange = onModeChange;
     this.#offersModel = offersModel;
-    this.#pointsModel = pointsModel;
     this.#destinationsModel = destinationsModel;
   }
 
@@ -52,9 +49,9 @@ export default class PointPresenter {
         point: this.#point,
         offers: this.#offersModel.offers,
         destinations: this.#destinationsModel.destinations,
-        allTypesPoints: this.#getTypesOfAllPoints(),
         onSaveButtonClick: this.#saveButtonClickHandler,
-        onResetButtonClick: this.#resetButtonClickHandler
+        onResetButtonClick: this.#resetButtonClickHandler,
+        onDeleteClick: this.#deleteButtonClickHandler
       }
     );
 
@@ -74,11 +71,6 @@ export default class PointPresenter {
     remove(prevPointComponent);
     remove(prevFormEditComponent);
 
-  }
-
-  #getTypesOfAllPoints() {
-    this.#pointsModel.points.forEach((points) => this.#allTypesPoints.add(points.type));
-    return this.#allTypesPoints;
   }
 
   resetView() {
@@ -111,8 +103,17 @@ export default class PointPresenter {
   };
 
   #saveButtonClickHandler = (updatedPoint) => {
-    this.#handlePointChange({ ...this.point, ...updatedPoint });
+
+    const isMinorUpdate = isBigDifference(this.#point, updatedPoint);
+
+    this.#handlePointChange(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      updatedPoint
+    );
+
     this.#replaceFormEditToPoint();
+
   };
 
   #resetButtonClickHandler = () => {
@@ -121,11 +122,23 @@ export default class PointPresenter {
   };
 
   #favoriteButtonClickHandler = () => {
-    this.#handlePointChange({ ...this.#point, isFavorite: !this.#point.isFavorite });
+    this.#handlePointChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      { ...this.#point, isFavorite: !this.#point.isFavorite }
+    );
+  };
+
+  #deleteButtonClickHandler = (point) => {
+    this.#handlePointChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point
+    );
   };
 
   #escapeKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
+    if (isEscapeKey(evt)) {
       evt.preventDefault();
       this.#formEditComponent.reset(this.#point);
       this.#replaceFormEditToPoint();
