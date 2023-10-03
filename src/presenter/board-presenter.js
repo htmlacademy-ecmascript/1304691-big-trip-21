@@ -25,9 +25,11 @@ export default class BoardPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
 
-  #allTypesPoints = new Set();
+  #isCreating = false;
 
   #tripEventsContainer = null;
+
+  #handleNewPointDestroy = null;
 
   constructor({ pointsModel, offersModel, destinationsModel, filterModel, onNewPointDestroy, tripEventsContainer }) {
     this.#pointsModel = pointsModel;
@@ -35,14 +37,14 @@ export default class BoardPresenter {
     this.#destinationsModel = destinationsModel;
     this.#filterModel = filterModel;
     this.#tripEventsContainer = tripEventsContainer;
+    this.#handleNewPointDestroy = onNewPointDestroy;
 
     this.#newPointPresenter = new NewPointPresenter({
-      allTypesPoints: this.#getTypesOfAllPoints(),
       offersModel: this.#offersModel,
       destinationsModel: this.#destinationsModel,
       pointsListContainer: this.#pointsListComponent.element,
       onDataChange: this.#viewActionHandler,
-      onDestroy: onNewPointDestroy
+      onDestroy: this.#newPointDestroyHandler
     });
 
     this.#pointsModel.addObserver(this.#modelEventHandler);
@@ -54,11 +56,22 @@ export default class BoardPresenter {
   }
 
   createPoint() {
+    this.#isCreating = true;
+
     this.#currentSortType = SortType.DEFAULT;
 
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
 
     this.#newPointPresenter.init();
+
+    if (this.points.length === 0) {
+      this.#renderSort();
+    }
+
+    if (this.#noPointsComponent) {
+      remove(this.#noPointsComponent);
+    }
+
   }
 
   get points() {
@@ -93,7 +106,7 @@ export default class BoardPresenter {
   #modelEventHandler = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        return this.#pointPresenters.get(data.id).init(data);
+        return this.#pointPresenters?.get(data.id)?.init(data);
       case UpdateType.MINOR:
         this.#clearBoard();
         this.#renderBoard();
@@ -106,9 +119,8 @@ export default class BoardPresenter {
   };
 
   #modeChangeHandler = () => {
-    this.#newPointPresenter.destroy();
-
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    this.#newPointPresenter.destroy();
   };
 
   #sortChangeHandler = (sortType) => {
@@ -155,7 +167,6 @@ export default class BoardPresenter {
         containerPoints: this.#pointsListComponent.element,
         offersModel: this.#offersModel,
         destinationsModel: this.#destinationsModel,
-        allTypesPoints: this.#getTypesOfAllPoints(),
         onPointChange: this.#viewActionHandler,
         onModeChange: this.#modeChangeHandler,
       }
@@ -174,6 +185,7 @@ export default class BoardPresenter {
 
     remove(this.#sortComponent);
     remove(this.#noPointsComponent);
+    this.#sortComponent = null;
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
@@ -205,11 +217,14 @@ export default class BoardPresenter {
     render(this.#noPointsComponent, this.#pointsListComponent.element);
   }
 
-  #getTypesOfAllPoints() {
-    this.#pointsModel.points.forEach((points) => this.#allTypesPoints.add(points.type));
-    return this.#allTypesPoints;
-  }
-
+  #newPointDestroyHandler = ({ isCanceled }) => {
+    this.#isCreating = false;
+    this.#handleNewPointDestroy();
+    if (this.points.length === 0 && isCanceled) {
+      remove(this.#sortComponent);
+      this.#renderBoard();
+    }
+  };
 
 }
 

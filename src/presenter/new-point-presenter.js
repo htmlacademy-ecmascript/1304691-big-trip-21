@@ -7,7 +7,7 @@ export default class NewPointPresenter {
   #pointsListContainer = null;
   #handleDataChange = null;
   #handleDestroy = null;
-  #formEditComponent = null;
+  #formNewComponent = null;
 
   #offersModel = null;
   #allTypesPoints = null;
@@ -24,34 +24,34 @@ export default class NewPointPresenter {
 
   init() {
 
-    if (this.#formEditComponent !== null) {
+    if (this.#formNewComponent !== null) {
       return;
     }
 
-    this.#formEditComponent = new FormEditView({
-      isNewPoint: 'true',
+    this.#formNewComponent = new FormEditView({
+      isNewPoint: true,
       offers: this.#offersModel.offers,
       destinations: this.#destinationsModel.destinations,
       allTypesPoints: this.#allTypesPoints,
       onSaveButtonClick: this.#formSubmitHandler,
-      onResetButtonClick: this.#deleteClickHandler
+      onResetButtonClick: this.#resetClickHandler
     });
 
-    render(this.#formEditComponent, this.#pointsListContainer, RenderPosition.AFTERBEGIN);
+    render(this.#formNewComponent, this.#pointsListContainer, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#escapeKeyDownHandler);
   }
 
-  destroy() {
-    if (this.#formEditComponent === null) {
+  destroy({ isCanceled = true } = {}) {
+    if (this.#formNewComponent === null) {
       return;
     }
 
-    this.#handleDestroy();
+    this.#handleDestroy({ isCanceled });
 
-    remove(this.#formEditComponent);
+    remove(this.#formNewComponent);
 
-    this.#formEditComponent = null;
+    this.#formNewComponent = null;
 
     document.removeEventListener('keydown', this.#escapeKeyDownHandler);
   }
@@ -62,10 +62,10 @@ export default class NewPointPresenter {
       UpdateType.MINOR,
       { id: crypto.randomUUID(), ...point },
     );
-    this.destroy();
+    this.destroy({ isCanceled: false });
   };
 
-  #deleteClickHandler = () => {
+  #resetClickHandler = () => {
     this.destroy();
   };
 

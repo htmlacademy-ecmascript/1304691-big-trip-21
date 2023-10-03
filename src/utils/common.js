@@ -15,7 +15,7 @@ function humanizePointDate(date, format) {
   return date ? dayjs(date).format(format) : '';
 }
 
-function getDifference(from, to) {
+function getDifferenceDate(from, to) {
   const parseDateFrom = dayjs(from);
   const parseDateTo = dayjs(to);
 
@@ -57,8 +57,8 @@ function getWeightForNullDate(dateA, dateB) {
 }
 
 function sortPointsByTime(pointA, pointB) {
-  const PointADuration = getDifference(pointA.dateFrom, pointA.dateTo);
-  const PointBDuration = getDifference(pointB.dateFrom, pointB.dateTo);
+  const PointADuration = getDifferenceDate(pointA.dateFrom, pointA.dateTo);
+  const PointBDuration = getDifferenceDate(pointB.dateFrom, pointB.dateTo);
   const weight = getWeightForNullDate(PointADuration, PointBDuration);
 
   return weight ?? dayjs(PointBDuration.format()).diff(PointADuration.format());
@@ -72,8 +72,8 @@ function sortPointsByDay(pointA, pointB) {
   return dayjs(pointA.dateFrom) - dayjs(pointB.dateFrom);
 }
 
-function isDatesEqual(dateA, dateB) {
-  return dayjs(dateA).isSame(dateB, 'D');
+function isBigDifference(pointA, pointB) {
+  return pointA.dateFrom !== pointB.dateFrom || pointA.basePrice !== pointB.basePrice || getDifferenceDate(pointA.dateFrom, pointA.dateTo) !== getDifferenceDate(pointB.dateFrom, pointB.dateTo);
 }
 
 export {
@@ -82,10 +82,9 @@ export {
   getRandomInteger,
   humanizePointDate,
   capitalizeFirstLetter,
-  getDifference,
   sortPointsByTime,
   sortPointsByPrice,
   sortPointsByDay,
-  isDatesEqual,
+  isBigDifference,
   capitalizeFirstLetterToLower
 };

@@ -24,19 +24,17 @@ const newPointButtonComponent = new newPointButtonView({
   onClick: newButtonClickHandler
 });
 
-const boardPresenter = new BoardPresenter({ pointsModel, offersModel, destinationsModel, filterModel, onNewPointDestroy: newPointFormCloseHandler, tripEventsContainer });
+const boardPresenter = new BoardPresenter({ pointsModel, offersModel, destinationsModel, filterModel, onNewPointDestroy: newPointFormCloseHandler, tripEventsContainer, newPointButtonComponent });
 
 const headerPresenter = new HeaderPresenter({ pointsModel, filterModel, offersModel, destinationsModel, tripMainEventsContainer, newPointButtonComponent });
-
 
 function newPointFormCloseHandler() {
   newPointButtonComponent.element.disabled = false;
 }
 
 function newButtonClickHandler() {
-  boardPresenter.createPoint();
-
   newPointButtonComponent.element.disabled = true;
+  boardPresenter.createPoint();
 }
 
 headerPresenter.init();

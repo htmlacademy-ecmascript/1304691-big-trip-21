@@ -2,13 +2,12 @@ import { render, replace, remove } from '../framework/render';
 import PointView from '../view/point-view';
 import FormEditView from '../view/form-edit-view';
 import { OFFER_EMPTY, UserAction, UpdateType } from '../const';
-import { isDatesEqual, isEscapeKey } from '../utils/common';
+import { isBigDifference, isEscapeKey } from '../utils/common';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING'
 };
-
 export default class PointPresenter {
   #containerPoints = null;
   #pointComponent = null;
@@ -19,14 +18,12 @@ export default class PointPresenter {
   #mode = Mode.DEFAULT;
   #offersModel = null;
   #destinationsModel = null;
-  #allTypesPoints = null;
 
-  constructor({ containerPoints, offersModel, destinationsModel, onPointChange, allTypesPoints, onModeChange }) {
+  constructor({ containerPoints, offersModel, destinationsModel, onPointChange, onModeChange }) {
     this.#containerPoints = containerPoints;
     this.#handlePointChange = onPointChange;
     this.#handleModeChange = onModeChange;
     this.#offersModel = offersModel;
-    this.#allTypesPoints = allTypesPoints;
     this.#destinationsModel = destinationsModel;
   }
 
@@ -49,11 +46,9 @@ export default class PointPresenter {
 
     this.#formEditComponent = new FormEditView(
       {
-        isNewPoint: 'false',
         point: this.#point,
         offers: this.#offersModel.offers,
         destinations: this.#destinationsModel.destinations,
-        allTypesPoints: this.#allTypesPoints,
         onSaveButtonClick: this.#saveButtonClickHandler,
         onResetButtonClick: this.#resetButtonClickHandler,
         onDeleteClick: this.#deleteButtonClickHandler
@@ -108,7 +103,8 @@ export default class PointPresenter {
   };
 
   #saveButtonClickHandler = (updatedPoint) => {
-    const isMinorUpdate = !isDatesEqual(this.#point.dateFrom, updatedPoint.dateFrom);
+
+    const isMinorUpdate = isBigDifference(this.#point, updatedPoint);
 
     this.#handlePointChange(
       UserAction.UPDATE_POINT,

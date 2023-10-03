@@ -1,26 +1,25 @@
-import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import { FULL_DATE_TIME_FORMAT } from '../const';
 import { humanizePointDate, capitalizeFirstLetterToLower } from '../utils/common';
-import { POINT_EMPTY } from '../const';
+import { POINT_EMPTY, POINT_TYPES } from '../const';
+import { CITY_NAMES } from '../mock/destinations-mock';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
 
-function createTypelist([...types]) {
-  return types.map((type) => `<div class="event__type-item">
+function createTypelist() {
+  return POINT_TYPES.map((type) => `<div class="event__type-item">
     <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
       <label class="event__type-label  event__type-label--${capitalizeFirstLetterToLower(type)}" for="event-type-${capitalizeFirstLetterToLower(type)}-1">${type}</label>
   </div>`).join('');
 }
 
-function createDestinationsList(destinations) {
-  if (destinations) {
-    return `<datalist id="destination-list-1">${createDestinationsItems(destinations)}</datalist>`;
-  }
+function createDestinationsList() {
+  return `<datalist id="destination-list-1">${createDestinationsItems(CITY_NAMES)}</datalist>`;
 }
 
 function createDestinationsItems(destinations) {
-  return destinations.map((destination) => `<option value="${destination.name}"></option>`).join('');
+  return destinations.map((destination) => `<option value="${destination}"></option>`).join('');
 }
 
 function createOfferItem(offersByType, offersId) {
@@ -37,31 +36,37 @@ function createOfferItem(offersByType, offersId) {
   }
 }
 
-function createDestinationImg(destination) {
-  if (destination) {
-    return destination.pictures.map(({ src, description }) => `<img class="event__photo" src="${src}" alt="${description}" />
+function createDestinationImg(destinationItem) {
+  return destinationItem.pictures.map(({ src, description }) => `<img class="event__photo" src="${src}" alt="${description}" />
   `).join('');
-  }
 }
 
-function createFormTemplate({ isNewPoint, state, destinations, offers, allTypesPoints }) {
+function createFormTemplate({ isNewPoint, state, destinations, offers }) {
 
   const { dateFrom, dateTo, offers: offersId, basePrice, destination, type } = state.point;
 
-  const destinationsList = createDestinationsList(destinations);
+  const destinationsList = createDestinationsList();
 
-  destinations = destinations.find((item) => item.id === destination);
+  const destinationItem = destinations.find((item) => item.id === destination);
 
-  const destinationPictures = createDestinationImg(destinations);
+  let destinationPictures = '';
 
-  offers = offers.find((offer) => offer.type === type);
+  if (destinationItem && destinationItem.pictures) {
+    destinationPictures = createDestinationImg(destinationItem);
+  }
 
-  const offersList = createOfferItem(offers, offersId);
+  const offersByType = offers.find((offer) => offer.type === type);
+
+  let offersList = '';
+
+  if (offersByType) {
+    offersList = createOfferItem(offersByType, offersId);
+  }
 
   const dateStartFormat = humanizePointDate(dateFrom, FULL_DATE_TIME_FORMAT);
   const dateEndFormat = humanizePointDate(dateTo, FULL_DATE_TIME_FORMAT);
 
-  const typeList = createTypelist(allTypesPoints);
+  const typeList = createTypelist();
 
   return (
     `<li class="trip-events__item">
@@ -86,8 +91,8 @@ function createFormTemplate({ isNewPoint, state, destinations, offers, allTypesP
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinations ? he.encode(destinations.name) : ''}" list="destination-list-1">
-            ${destinations ? destinationsList : ''}
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationItem ? he.encode(destinationItem.name) : ''}" list="destination-list-1">
+            ${destinationsList}
           </div>
 
           <div class="event__field-group  event__field-group--time">
@@ -119,10 +124,10 @@ function createFormTemplate({ isNewPoint, state, destinations, offers, allTypesP
           </section>
           ` : ''}
 
-          ${destinations ? `
+          ${destinationItem ? `
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${destinations.description ? destinations.description : ''}</p>
+            <p class="event__destination-description">${destinationItem.description ? destinationItem.description : ''}</p>
 
             <div class="event__photos-container">
               <div class="event__photos-tape">
@@ -143,23 +148,22 @@ export default class FormEditView extends AbstractStatefulView {
   #destinations = null;
   #handleFormSave = null;
   #handleFormClose = null;
-  #allTypesPoints = null;
   #datePickerFrom = null;
   #datePickerTo = null;
   #handleDeleteClick = null;
   #isNewPoint = null;
 
-  constructor({ isNewPoint, point = POINT_EMPTY, offers, destinations, allTypesPoints, onSaveButtonClick, onResetButtonClick, onDeleteClick }) {
+  constructor({ isNewPoint = false, point = POINT_EMPTY, offers, destinations, onSaveButtonClick, onResetButtonClick, onDeleteClick }) {
     super();
-    this._setState(FormEditView.parsePointToState({ point }));
 
     this.#isNewPoint = isNewPoint;
     this.#offers = offers;
     this.#destinations = destinations;
-    this.#allTypesPoints = allTypesPoints;
     this.#handleFormSave = onSaveButtonClick;
     this.#handleFormClose = onResetButtonClick;
     this.#handleDeleteClick = onDeleteClick;
+
+    this._setState(FormEditView.parsePointToState({ point }));
 
     this._restoreHandlers();
   }
@@ -170,7 +174,6 @@ export default class FormEditView extends AbstractStatefulView {
       state: this._state,
       destinations: this.#destinations,
       offers: this.#offers,
-      allTypesPoints: this.#allTypesPoints
     });
   }
 
@@ -189,11 +192,21 @@ export default class FormEditView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
+    if (this.#isNewPoint === false) {
+      this.element.querySelector('.event__rollup-btn')
+        .addEventListener('click', this.#resetClickHandler);
+
+      this.element.querySelector('.event__reset-btn')
+        .addEventListener('click', this.#formDeleteClickHandler);
+    }
+
+    if (this.#isNewPoint) {
+      this.element.querySelector('.event__reset-btn')
+        .addEventListener('click', this.#resetClickHandler);
+    }
+
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSaveHandler);
-
-    this.element.querySelector('.event__rollup-btn')
-      ?.addEventListener('click', this.#resetClickHandler);
 
     this.element.querySelector('.event__type-group')
       .addEventListener('change', this.#typeChangeHandler);
@@ -206,9 +219,6 @@ export default class FormEditView extends AbstractStatefulView {
 
     this.element.querySelector('.event__input--price')
       .addEventListener('change', this.#priceChangeHandler);
-
-    this.element.querySelector('.event__reset-btn')
-      .addEventListener('click', this.#formDeleteClickHandler);
 
     this.#setDatePickers();
   }
