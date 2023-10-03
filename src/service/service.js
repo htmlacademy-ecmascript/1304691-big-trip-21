@@ -12,7 +12,10 @@ export default class Service {
   offers = [];
   destinations = [];
 
-  constructor() {
+  pointsApiService = null;
+
+  constructor({ pointsApiService }) {
+    this.pointsApiService = pointsApiService;
     this.offers = this.generateOffers();
     this.destinations = this.generateDestinations();
     this.points = this.generatePoints();
@@ -58,6 +61,10 @@ export default class Service {
 
   getPoints() {
     return this.points;
+  }
+
+  getPointsApiService() {
+    return this.pointsApiService;
   }
 }
 

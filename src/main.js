@@ -10,10 +10,17 @@ import newPointButtonView from './view/new-point-button-view';
 
 import Service from './service/service';
 
+import PointsApiService  from './points-api-service';
+
+const AUTHORISATION = 'Basic er883jdzbdw';
+const END_POINT = 'https://21.objects.pages.academy/big-trip';
+
 const tripMainEventsContainer = document.querySelector('.trip-main');
 const tripEventsContainer = document.querySelector('.trip-events');
 
-const service = new Service();
+const service = new Service({
+  pointsApiService: new PointsApiService(END_POINT, AUTHORISATION)
+});
 
 const pointsModel = new PointsModel(service);
 const offersModel = new OffersModel(service);
