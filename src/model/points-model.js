@@ -1,7 +1,7 @@
 import Observable from '../framework/observable.js';
 export default class PointsModel extends Observable {
   #servise = null;
-  #points = null;
+  #points = [];
   #pointApiService = null;
 
   constructor(servise) {
@@ -9,14 +9,6 @@ export default class PointsModel extends Observable {
     this.#servise = servise;
     this.#points = this.#servise.getPoints();
     this.#pointApiService = this.#servise.getPointsApiService();
-
-    this.#pointApiService.points.then((points) => {
-      console.log(points.map(this.#adaptToClient));
-      // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
-      // а ещё на сервере используется snake_case, а у нас camelCase.
-      // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
-      // Есть вариант получше - паттерн "Адаптер"
-    });
   }
 
   #adaptToClient(point) {
@@ -37,6 +29,15 @@ export default class PointsModel extends Observable {
 
   get points() {
     return this.#points;
+  }
+
+  async init() {
+    try {
+      const points = await this.#pointApiService.points;
+      this.#points = points.map(this.#adaptToClient);
+    } catch(err) {
+      this.#points = [];
+    }
   }
 
   updatePoint(updateType, update) {
