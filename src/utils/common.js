@@ -7,10 +7,6 @@ function isEscapeKey(evt) {
   return evt.key === 'Escape' || evt.key === 'Esc';
 }
 
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
 function humanizePointDate(date, format) {
   return date ? dayjs(date).format(format) : '';
 }
@@ -22,14 +18,6 @@ function getDifferenceDate(from, to) {
   const eventDuration = parseDateTo.diff(parseDateFrom);
 
   return dayjs.duration(eventDuration);
-}
-
-function getRandomInteger(min, max) {
-  const lower = Math.ceil(Math.min(min, max));
-  const upper = Math.floor(Math.max(min, max));
-  const result = Math.random() * (upper - lower + 1) + lower;
-
-  return Math.floor(result);
 }
 
 function capitalizeFirstLetter(string) {
@@ -76,15 +64,54 @@ function isBigDifference(pointA, pointB) {
   return pointA.dateFrom !== pointB.dateFrom || pointA.basePrice !== pointB.basePrice || getDifferenceDate(pointA.dateFrom, pointA.dateTo) !== getDifferenceDate(pointB.dateFrom, pointB.dateTo);
 }
 
+function updateItem(items, update) {
+  return items.map((item) => item.id === update.id ? update : item);
+}
+
+function adaptToServer(point) {
+  const adaptedPoint = {
+    ...point,
+    ['base_price']: point.basePrice,
+    ['date_from']: new Date(point.dateFrom).toISOString(),
+    ['date_to']: new Date(point.dateTo).toISOString(),
+    ['is_favorite']: point.isFavorite,
+  };
+
+  delete adaptedPoint.basePrice;
+  delete adaptedPoint.dateFrom;
+  delete adaptedPoint.dateTo;
+  delete adaptedPoint.isFavorite;
+
+  return adaptedPoint;
+}
+
+function adaptToClient(point) {
+  const adaptedPoint = {
+    ...point,
+    basePrice: point['base_price'],
+    dateFrom: point['date_from'],
+    dateTo: point['date_to'],
+    isFavorite: point['is_favorite'],
+  };
+
+  delete adaptedPoint['base_price'];
+  delete adaptedPoint['date_from'];
+  delete adaptedPoint['date_to'];
+  delete adaptedPoint['is_favorite'];
+
+  return adaptedPoint;
+}
+
 export {
   isEscapeKey,
-  getRandomArrayElement,
-  getRandomInteger,
   humanizePointDate,
   capitalizeFirstLetter,
   sortPointsByTime,
   sortPointsByPrice,
   sortPointsByDay,
   isBigDifference,
-  capitalizeFirstLetterToLower
+  capitalizeFirstLetterToLower,
+  updateItem,
+  adaptToServer,
+  adaptToClient
 };

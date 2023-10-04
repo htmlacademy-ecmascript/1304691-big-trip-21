@@ -1,10 +1,12 @@
 import { RenderPosition, render, remove } from '../framework/render';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
+import LoadingView from '../view/loading-view';
 import PointPresenter from './point-presenter';
 import { filter } from '../utils/filter';
-import { SortType, enabledSortType, UpdateType, UserAction, FilterType } from '../const';
+import { SortType, enabledSortType, UpdateType, UserAction, FilterType, TimeLimit } from '../const';
 import { sortPointsByTime, sortPointsByPrice, sortPointsByDay } from '../utils/common';
 import NewPointPresenter from './new-point-presenter';
 
@@ -15,15 +17,22 @@ export default class BoardPresenter {
   #destinationsModel = null;
   #filterModel = null;
 
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
+
   #sortComponent = null;
   #pointsListComponent = new ListView();
   #noPointsComponent = null;
+  #loadingComponent = new LoadingView();
 
   #pointPresenters = new Map();
   #newPointPresenter = null;
 
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
+  #isLoading = true;
 
   #isCreating = false;
 
@@ -49,10 +58,6 @@ export default class BoardPresenter {
 
     this.#pointsModel.addObserver(this.#modelEventHandler);
     this.#filterModel.addObserver(this.#modelEventHandler);
-  }
-
-  init() {
-    this.#renderBoard();
   }
 
   createPoint() {
@@ -88,19 +93,38 @@ export default class BoardPresenter {
       case SortType.DEFAULT:
         return filteredPoints.sort(sortPointsByDay);
     }
-
     return this.filteredPoints;
   }
 
-  #viewActionHandler = (actionType, updateType, update) => {
+  #viewActionHandler = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        return this.#pointsModel.updatePoint(updateType, update);
-      case UserAction.ADD_POINT:
-        return this.#pointsModel.addPoint(updateType, update);
+        this.#pointPresenters.get(update.id).setSaving();
+        try {
+          await this.#pointsModel.update(updateType, update);
+        } catch {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
+        break;
       case UserAction.DELETE_POINT:
-        return this.#pointsModel.deletePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setDeleting();
+        try {
+          await this.#pointsModel.delete(updateType, update);
+        } catch {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
+        break;
+      case UserAction.ADD_POINT:
+        this.#newPointPresenter.setSaving();
+        try {
+          await this.#pointsModel.add(updateType, update);
+        } catch {
+          this.#newPointPresenter.setAborting();
+        }
+        break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #modelEventHandler = (updateType, data) => {
@@ -113,6 +137,11 @@ export default class BoardPresenter {
         break;
       case UpdateType.MAJOR:
         this.#clearBoard({ resetSortType: true });
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderBoard();
         break;
     }
@@ -160,6 +189,10 @@ export default class BoardPresenter {
     });
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, this.#tripEventsContainer);
+  }
+
   #renderPoint(point) {
 
     const pointPresenter = new PointPresenter(
@@ -185,14 +218,11 @@ export default class BoardPresenter {
 
     remove(this.#sortComponent);
     remove(this.#noPointsComponent);
+    remove(this.#loadingComponent);
     this.#sortComponent = null;
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
-    }
-
-    if (this.#noPointsComponent) {
-      remove(this.#noPointsComponent);
     }
 
   }
@@ -202,6 +232,11 @@ export default class BoardPresenter {
 
     if (this.points.length === 0) {
       this.#renderNoPoints();
+      return;
+    }
+
+    if (this.#isLoading) {
+      this.#renderLoading();
       return;
     }
 

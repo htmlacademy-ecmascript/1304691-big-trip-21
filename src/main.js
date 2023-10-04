@@ -8,16 +8,18 @@ import FilterModel from './model/filter-model.js';
 
 import newPointButtonView from './view/new-point-button-view';
 
-import Service from './service/service';
+import ApiService from './api-service';
+
+const AUTHORIZATION = 'Basic er883jdzbdw';
+const END_POINT = 'https://21.objects.pages.academy/big-trip';
 
 const tripMainEventsContainer = document.querySelector('.trip-main');
 const tripEventsContainer = document.querySelector('.trip-events');
 
-const service = new Service();
-
-const pointsModel = new PointsModel(service);
+const service = new ApiService(END_POINT, AUTHORIZATION);
 const offersModel = new OffersModel(service);
 const destinationsModel = new DestinationsModel(service);
+const pointsModel = new PointsModel({ service, offersModel, destinationsModel });
 const filterModel = new FilterModel();
 
 const newPointButtonComponent = new newPointButtonView({
@@ -38,6 +40,9 @@ function newButtonClickHandler() {
 }
 
 headerPresenter.init();
-boardPresenter.init();
+pointsModel.init()
+  .finally(() => {
+    headerPresenter.renderNewPointButton();
+  });
 
 
