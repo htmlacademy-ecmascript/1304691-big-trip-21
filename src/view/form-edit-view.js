@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import { FULL_DATE_TIME_FORMAT } from '../const';
-import { humanizePointDate, capitalizeFirstLetterToLower } from '../utils/common';
-import { POINT_EMPTY, POINT_TYPES } from '../const';
+import { humanizePointDate, capitalizeFirstLetter } from '../utils/common';
+import { POINT_EMPTY } from '../const';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
@@ -14,10 +14,10 @@ const ButtonLabel = {
   SAVE_IN_PROGRESS: 'Saving...'
 };
 
-function createTypelist() {
-  return POINT_TYPES.map((type) => `<div class="event__type-item">
-    <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
-      <label class="event__type-label  event__type-label--${capitalizeFirstLetterToLower(type)}" for="event-type-${capitalizeFirstLetterToLower(type)}-1">${type}</label>
+function createTypelist(offers) {
+  return offers.map(({type}) => `<div class="event__type-item">
+    <input id="event-type-${type}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
+      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${capitalizeFirstLetter(type)}</label>
   </div>`).join('');
 }
 
@@ -97,7 +97,7 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
   const dateStartFormat = humanizePointDate(dateFrom, FULL_DATE_TIME_FORMAT);
   const dateEndFormat = humanizePointDate(dateTo, FULL_DATE_TIME_FORMAT);
 
-  const typeList = createTypelist();
+  const typeList = createTypelist(offers);
 
   return (
     `<li class="trip-events__item">
@@ -307,7 +307,7 @@ export default class FormEditView extends AbstractStatefulView {
     this._setState({
       point: {
         ...this._state.point,
-        offers: checkedBoxes.map((element) => +element.dataset.id)
+        offers: checkedBoxes.map((element) => element.dataset.id)
       }
     });
   };
