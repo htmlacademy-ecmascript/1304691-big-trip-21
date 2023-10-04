@@ -22,8 +22,6 @@ const service = new Service({
   pointsApiService: new PointsApiService(END_POINT, AUTHORISATION)
 });
 
-service.init();
-
 const pointsModel = new PointsModel(service);
 const offersModel = new OffersModel(service);
 const destinationsModel = new DestinationsModel(service);
@@ -48,5 +46,9 @@ function newButtonClickHandler() {
 
 headerPresenter.init();
 boardPresenter.init();
+service.init()
+  .finally(() => {
+    headerPresenter.renderNewPointButton();
+  });
 
 

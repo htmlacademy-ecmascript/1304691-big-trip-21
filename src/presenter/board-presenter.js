@@ -2,6 +2,7 @@ import { RenderPosition, render, remove } from '../framework/render';
 import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
+import LoadingView from '../view/loading-view';
 import PointPresenter from './point-presenter';
 import { filter } from '../utils/filter';
 import { SortType, enabledSortType, UpdateType, UserAction, FilterType } from '../const';
@@ -18,12 +19,14 @@ export default class BoardPresenter {
   #sortComponent = null;
   #pointsListComponent = new ListView();
   #noPointsComponent = null;
+  #loadingComponent = new LoadingView();
 
   #pointPresenters = new Map();
   #newPointPresenter = null;
 
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
+  #isLoading = true;
 
   #isCreating = false;
 
@@ -115,6 +118,11 @@ export default class BoardPresenter {
         this.#clearBoard({ resetSortType: true });
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
 
@@ -160,6 +168,10 @@ export default class BoardPresenter {
     });
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, this.#tripEventsContainer);
+  }
+
   #renderPoint(point) {
 
     const pointPresenter = new PointPresenter(
@@ -185,6 +197,7 @@ export default class BoardPresenter {
 
     remove(this.#sortComponent);
     remove(this.#noPointsComponent);
+    remove(this.#loadingComponent);
     this.#sortComponent = null;
 
     if (resetSortType) {
@@ -202,6 +215,11 @@ export default class BoardPresenter {
 
     if (this.points.length === 0) {
       this.#renderNoPoints();
+      return;
+    }
+
+    if (this.#isLoading) {
+      this.#renderLoading();
       return;
     }
 

@@ -33,7 +33,6 @@ export default class HeaderPresenter {
     }
 
     this.#initFilter();
-    this.#renderNewPointButton();
   }
 
   #initFilter() {
@@ -80,7 +79,7 @@ export default class HeaderPresenter {
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
 
-  #renderNewPointButton() {
+  renderNewPointButton() {
     render(this.#newPointButtonComponent, this.#tripMainEventsContainer);
   }
 
