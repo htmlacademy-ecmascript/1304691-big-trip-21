@@ -1,10 +1,12 @@
+import { UpdateType } from '../const';
+import Observable from '../framework/observable';
 import { createDestination } from '../mock/destinations-mock';
 import { createListOffers } from '../mock/offers-mock';
 import { getRandomInteger } from '../utils/common';
 
 const OFFERS_COUNT = 10;
 const DESTINATIONS_COUNT = 10;
-export default class Service {
+export default class Service extends Observable {
   points = [];
   offers = [];
   destinations = [];
@@ -12,6 +14,8 @@ export default class Service {
   pointsApiService = null;
 
   constructor({ pointsApiService }) {
+    super();
+
     this.pointsApiService = pointsApiService;
     this.offers = this.generateOffers();
     this.destinations = this.generateDestinations();
@@ -24,6 +28,8 @@ export default class Service {
     } catch (err) {
       this.points = [];
     }
+
+    this._notify(UpdateType.INIT);
   }
 
   #adaptToClient(point) {
