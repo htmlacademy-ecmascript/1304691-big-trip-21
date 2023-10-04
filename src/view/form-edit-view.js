@@ -2,7 +2,7 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import { FULL_DATE_TIME_FORMAT } from '../const';
 import { humanizePointDate, capitalizeFirstLetterToLower } from '../utils/common';
 import { POINT_EMPTY, POINT_TYPES } from '../const';
-import { CITY_NAMES } from '../mock/destinations-mock';
+import { CITY_NAMES } from '../const';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';

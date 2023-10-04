@@ -57,6 +57,20 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
+const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
+};
+
+const CITY_NAMES = ['Chamonix', 'Geneva', 'Amsterdam', 'Rome', 'Barcelona', 'Valencia', 'Jerusalem', 'Kyoto'];
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
 export {
   DATE_TIME_FORMAT,
   FULL_DATE_TIME_FORMAT,
@@ -68,6 +82,9 @@ export {
   SortType,
   enabledSortType,
   UserAction,
-  UpdateType
+  UpdateType,
+  Method,
+  CITY_NAMES,
+  TimeLimit
 };
 

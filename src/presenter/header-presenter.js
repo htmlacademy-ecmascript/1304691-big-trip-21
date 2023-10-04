@@ -27,10 +27,7 @@ export default class HeaderPresenter {
   }
 
   init() {
-
-    if (this.#pointsModel.points.length !== 0) {
-      render(new InfoView(), this.#tripMainEventsContainer);
-    }
+    render(new InfoView(), this.#tripMainEventsContainer);
 
     this.#initFilter();
   }
