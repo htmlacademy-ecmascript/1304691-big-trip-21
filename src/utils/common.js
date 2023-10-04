@@ -7,10 +7,6 @@ function isEscapeKey(evt) {
   return evt.key === 'Escape' || evt.key === 'Esc';
 }
 
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
 function humanizePointDate(date, format) {
   return date ? dayjs(date).format(format) : '';
 }
@@ -22,14 +18,6 @@ function getDifferenceDate(from, to) {
   const eventDuration = parseDateTo.diff(parseDateFrom);
 
   return dayjs.duration(eventDuration);
-}
-
-function getRandomInteger(min, max) {
-  const lower = Math.ceil(Math.min(min, max));
-  const upper = Math.floor(Math.max(min, max));
-  const result = Math.random() * (upper - lower + 1) + lower;
-
-  return Math.floor(result);
 }
 
 function capitalizeFirstLetter(string) {
@@ -116,8 +104,6 @@ function adaptToClient(point) {
 
 export {
   isEscapeKey,
-  getRandomArrayElement,
-  getRandomInteger,
   humanizePointDate,
   capitalizeFirstLetter,
   sortPointsByTime,

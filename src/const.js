@@ -64,8 +64,6 @@ const Method = {
   DELETE: 'DELETE',
 };
 
-const CITY_NAMES = ['Chamonix', 'Geneva', 'Amsterdam', 'Rome', 'Barcelona', 'Valencia', 'Jerusalem', 'Kyoto'];
-
 const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
@@ -84,7 +82,6 @@ export {
   UserAction,
   UpdateType,
   Method,
-  CITY_NAMES,
   TimeLimit
 };
 
