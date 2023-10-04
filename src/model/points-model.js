@@ -11,12 +11,28 @@ export default class PointsModel extends Observable {
     this.#pointApiService = this.#servise.getPointsApiService();
 
     this.#pointApiService.points.then((points) => {
-      console.log(points);
+      console.log(points.map(this.#adaptToClient));
       // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
       // а ещё на сервере используется snake_case, а у нас camelCase.
       // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
       // Есть вариант получше - паттерн "Адаптер"
     });
+  }
+
+  #adaptToClient(point) {
+    const adaptedPoint = {
+      ...point,
+      basePrice: point['base_price'],
+      dateFrom: point['date_from'],
+      dateTo: point['date_to'],
+      isFavorite: point['is_favorite'],
+    };
+
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['date_from'];
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['is_favorite'];
+    return adaptedPoint;
   }
 
   get points() {
@@ -49,7 +65,7 @@ export default class PointsModel extends Observable {
   }
 
   deletePoint(updateType, update) {
-    const index = this.#points.findIndex((task) => task.id === update.id);
+    const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting points');
