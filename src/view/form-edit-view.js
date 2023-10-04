@@ -7,6 +7,14 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
 
+const ButtonLabel = {
+  CANCEL_DEFAULT: 'Cancel',
+  DELETE_DEFAULT: 'Delete',
+  DELETE_IN_PROGRESS: 'Deleting...',
+  SAVE_DEFAULT: 'Save',
+  SAVE_IN_PROGRESS: 'Saving...'
+};
+
 function createTypelist() {
   return POINT_TYPES.map((type) => `<div class="event__type-item">
     <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
@@ -41,9 +49,33 @@ function createDestinationImg(destinationItem) {
   `).join('');
 }
 
+function createDeleteButtonTemplate({ isNewPoint, isDeleting, isDisabled }) {
+  let label;
+
+  if (isNewPoint) {
+    label = ButtonLabel.CANCEL_DEFAULT;
+  } else {
+    label = isDeleting ? ButtonLabel.DELETE_IN_PROGRESS : ButtonLabel.DELETE_DEFAULT;
+  }
+
+  return `<button class="event__reset-btn" type="reset"${isDisabled ? 'disabled' : ''}>${label}</button>`;
+}
+
+function createRollupButtonTemplate(isDisabled) {
+  return `<button class="event__rollup-btn" type="button"><span class="visually-hidden" ${isDisabled ? 'disabled' : ''}> Open event</span></button>`;
+}
+
+function createSaveButtonTemplate({ isSaving, isDisabled }) {
+  const label = isSaving ? ButtonLabel.SAVE_IN_PROGRESS : ButtonLabel.SAVE_DEFAULT;
+
+  return `<button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${label}</button>`;
+}
+
 function createFormTemplate({ isNewPoint, state, destinations, offers }) {
 
-  const { dateFrom, dateTo, offers: offersId, basePrice, destination, type } = state.point;
+  const { point, isSaving, isDeleting, isDisabled } = state;
+
+  const { dateFrom, dateTo, offers: offersId, basePrice, destination, type } = point;
 
   const destinationsList = createDestinationsList();
 
@@ -111,8 +143,9 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
             <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          ${isNewPoint ? '<button class="event__reset-btn" type="reset">Cancel</button>' : '<button class="event__reset-btn" type="reset">Delete</button><button class="event__rollup-btn" type="button"><span class="visually-hidden" > Open event</span></button>'}
+          ${createSaveButtonTemplate({ isSaving, isDisabled })}
+          ${createDeleteButtonTemplate({ isNewPoint, isDeleting, isDisabled })}
+          ${isNewPoint ? '' : createRollupButtonTemplate(isDisabled)}
         </header>
         <section class="event__details">
           ${offersList ? `
@@ -338,8 +371,13 @@ export default class FormEditView extends AbstractStatefulView {
     );
   }
 
-  static parsePointToState({ point }) {
-    return { point };
+  static parsePointToState({ point, isDisabled = false, isSaving = false, isDeleting = false }) {
+    return {
+      point,
+      isDisabled,
+      isSaving,
+      isDeleting
+    };
   }
 
   static parseStateToPoint(state) {

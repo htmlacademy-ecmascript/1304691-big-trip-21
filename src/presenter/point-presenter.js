@@ -85,6 +85,40 @@ export default class PointPresenter {
     remove(this.#formEditComponent);
   }
 
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#formEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true
+      });
+    }
+  }
+
+  setDeleting() {
+    this.#formEditComponent.updateElement({
+      isDisabled: true,
+      isDeleting: true
+    });
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.pointComponent.shake();
+    }
+
+    if (this.#mode === Mode.EDITING) {
+      const resetFormState = () => {
+        this.#formEditComponent.updateElement({
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        });
+      };
+
+      this.#formEditComponent.shake(resetFormState);
+    }
+  }
+
   #replacePointToFormEdit() {
     replace(this.#formEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escapeKeyDownHandler);
