@@ -98,6 +98,10 @@ function adaptToClient(point) {
   return adaptedPoint;
 }
 
+function changeToLowerCase(name) {
+  return name.split(' ').join('').toLowerCase();
+}
+
 export {
   isEscapeKey,
   humanizePointDate,
@@ -108,5 +112,6 @@ export {
   isBigDifference,
   updateItem,
   adaptToServer,
-  adaptToClient
+  adaptToClient,
+  changeToLowerCase
 };

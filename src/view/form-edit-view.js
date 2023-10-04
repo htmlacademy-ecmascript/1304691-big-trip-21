@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import { FULL_DATE_TIME_FORMAT } from '../const';
-import { humanizePointDate, capitalizeFirstLetter } from '../utils/common';
+import { humanizePointDate, capitalizeFirstLetter, changeToLowerCase } from '../utils/common';
 import { POINT_EMPTY } from '../const';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -30,17 +30,15 @@ function createDestinationsItems(destinations) {
 }
 
 function createOfferItem({ offersByType, offersId, isDisabled }) {
-  if (offersByType) {
-    return offersByType.offers.map(({ title, price, id }) => `<div class="event__offer-selector">
-      <input class="event__offer-checkbox visually-hidden" id="event-offer-luggage-${id}" data-id="${id}" type="checkbox" name="event-offer-luggage" ${offersId.includes(id) ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
-        <label class="event__offer-label" for="event-offer-luggage-${id}">
+  return offersByType.offers.map(({ title, price, id }) => `<div class="event__offer-selector">
+      <input class="event__offer-checkbox visually-hidden" id="event-offer-${encode(changeToLowerCase(title))}-1" data-id="${id}" type="checkbox" name="event-offer-${encode(changeToLowerCase(title))}" ${offersId.includes(id) ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
+        <label class="event__offer-label" for="event-offer-${encode(changeToLowerCase(title))}-1">
           <span class="event__offer-title">${encode(title)}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${encode(String(price))}</span>
         </label>
     </div>`
-    ).join('');
-  }
+  ).join('');
 }
 
 function createDestinationImg(destinationItem) {

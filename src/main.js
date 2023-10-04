@@ -40,6 +40,9 @@ function newButtonClickHandler() {
 }
 
 headerPresenter.init();
+
+boardPresenter.init();
+
 pointsModel.init()
   .finally(() => {
     headerPresenter.renderNewPointButton();
