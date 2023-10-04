@@ -11,33 +11,8 @@ export default class PointsModel extends Observable {
     this.#pointApiService = this.#servise.getPointsApiService();
   }
 
-  #adaptToClient(point) {
-    const adaptedPoint = {
-      ...point,
-      basePrice: point['base_price'],
-      dateFrom: point['date_from'],
-      dateTo: point['date_to'],
-      isFavorite: point['is_favorite'],
-    };
-
-    delete adaptedPoint['base_price'];
-    delete adaptedPoint['date_from'];
-    delete adaptedPoint['date_to'];
-    delete adaptedPoint['is_favorite'];
-    return adaptedPoint;
-  }
-
   get points() {
     return this.#points;
-  }
-
-  async init() {
-    try {
-      const points = await this.#pointApiService.points;
-      this.#points = points.map(this.#adaptToClient);
-    } catch(err) {
-      this.#points = [];
-    }
   }
 
   updatePoint(updateType, update) {
