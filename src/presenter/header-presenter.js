@@ -6,28 +6,36 @@ import { UpdateType } from '../const';
 
 export default class HeaderPresenter {
   #filterComponent = null;
+  #infoViewComponent = null;
 
   #pointsModel = null;
   #filterModel = null;
+  #destinationsModel = null;
+  #offersModel = null;
 
   #tripMainEventsContainer = null;
 
-  #newPointButtonComponent = null;
 
-  constructor({ pointsModel, filterModel, tripMainEventsContainer, newPointButtonComponent }) {
+  constructor({ pointsModel, filterModel, tripMainEventsContainer, offersModel, destinationsModel }) {
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
 
     this.#tripMainEventsContainer = tripMainEventsContainer;
-
-    this.#newPointButtonComponent = newPointButtonComponent;
 
     this.#pointsModel.addObserver(this.#modelEventHandler);
     this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
   init() {
-    render(new InfoView(), this.#tripMainEventsContainer);
+    this.#infoViewComponent = new InfoView({
+      destinations: this.#destinationsModel.destinations,
+      offers: this.#offersModel.offers,
+      points: this.#pointsModel.points
+    });
+
+    render(this.#infoViewComponent, this.#tripMainEventsContainer);
 
     this.#initFilter();
   }
@@ -75,9 +83,5 @@ export default class HeaderPresenter {
 
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
-
-  renderNewPointButton() {
-    render(this.#newPointButtonComponent, this.#tripMainEventsContainer);
-  }
 
 }

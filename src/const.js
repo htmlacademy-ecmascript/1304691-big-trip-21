@@ -67,6 +67,8 @@ const TimeLimit = {
   UPPER_LIMIT: 1000,
 };
 
+const DESTINATIONS_ITEMS_LENGTH = 3;
+
 export {
   DATE_TIME_FORMAT,
   FULL_DATE_TIME_FORMAT,
@@ -79,6 +81,7 @@ export {
   UserAction,
   UpdateType,
   Method,
-  TimeLimit
+  TimeLimit,
+  DESTINATIONS_ITEMS_LENGTH
 };
 
