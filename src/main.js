@@ -10,11 +10,14 @@ import newPointButtonView from './view/new-point-button-view';
 
 import ApiService from './api-service';
 
+import { render, RenderPosition } from './framework/render.js';
+
 const AUTHORIZATION = 'Basic er883jdzbdw';
 const END_POINT = 'https://21.objects.pages.academy/big-trip';
 
 const tripMainEventsContainer = document.querySelector('.trip-main');
 const tripEventsContainer = document.querySelector('.trip-events');
+
 
 const service = new ApiService(END_POINT, AUTHORIZATION);
 const offersModel = new OffersModel(service);
@@ -23,29 +26,29 @@ const pointsModel = new PointsModel({ service, offersModel, destinationsModel })
 const filterModel = new FilterModel();
 
 const newPointButtonComponent = new newPointButtonView({
-  onClick: newButtonClickHandler
+  onClick: newPointButtonClickHandler
 });
 
-const boardPresenter = new BoardPresenter({ pointsModel, offersModel, destinationsModel, filterModel, onNewPointDestroy: newPointFormCloseHandler, tripEventsContainer, newPointButtonComponent });
+const boardPresenter = new BoardPresenter({ pointsModel, offersModel, destinationsModel, filterModel, blockNewPointButton, unBlockNewPointButton, tripEventsContainer });
 
-const headerPresenter = new HeaderPresenter({ pointsModel, filterModel, offersModel, destinationsModel, tripMainEventsContainer, newPointButtonComponent });
+const headerPresenter = new HeaderPresenter({ pointsModel, filterModel, offersModel, destinationsModel, tripMainEventsContainer });
 
-function newPointFormCloseHandler() {
-  newPointButtonComponent.element.disabled = false;
-}
-
-function newButtonClickHandler() {
+function newPointButtonClickHandler() {
   newPointButtonComponent.element.disabled = true;
   boardPresenter.createPoint();
 }
 
-headerPresenter.init();
+function blockNewPointButton() {
+  newPointButtonComponent.element.disabled = false;
+}
+
+function unBlockNewPointButton() {
+  newPointButtonComponent.element.disabled = false;
+}
 
 boardPresenter.init();
-
-pointsModel.init()
-  .finally(() => {
-    headerPresenter.renderNewPointButton();
-  });
+headerPresenter.init();
+render(newPointButtonComponent, tripMainEventsContainer, RenderPosition.BEFOREEND);
+pointsModel.init();
 
 

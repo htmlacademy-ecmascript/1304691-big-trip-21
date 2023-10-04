@@ -8,21 +8,24 @@ const NoPointsMessageType = {
   [FilterType.FUTURE]: 'There are no future events now'
 };
 
-function createNoPointsMessage(filterType) {
+function createNoPointsMessage(filterType, isServerAvailable) {
   const noPointsMessageValue = NoPointsMessageType[filterType];
 
-  return `<p class="trip-events__msg">${noPointsMessageValue}</p>`;
+  return isServerAvailable ? (
+    `<p class="trip-events__msg">${noPointsMessageValue}</p>`) : '<p class="trip-events__msg">Failed to load latest route information</p>';
 }
 
 export default class NoPointsView extends AbstractView {
   #filterType = null;
+  #isServerAvailable = null;
 
-  constructor({filterType}) {
+  constructor({ filterType, isServerAvailable }) {
     super();
     this.#filterType = filterType;
+    this.#isServerAvailable = isServerAvailable;
   }
 
   get template() {
-    return createNoPointsMessage(this.#filterType);
+    return createNoPointsMessage(this.#filterType, this.#isServerAvailable);
   }
 }
