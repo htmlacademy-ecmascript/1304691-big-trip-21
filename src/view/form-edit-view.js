@@ -1,10 +1,10 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import { FULL_DATE_TIME_FORMAT } from '../const';
-import { humanizePointDate, capitalizeFirstLetterToLower } from '../utils/common';
-import { POINT_EMPTY, POINT_TYPES } from '../const';
+import { humanizePointDate, capitalizeFirstLetter, changeToLowerCase } from '../utils/common';
+import { POINT_EMPTY } from '../const';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import he from 'he';
+import { encode } from 'he';
 
 const ButtonLabel = {
   CANCEL_DEFAULT: 'Cancel',
@@ -14,10 +14,10 @@ const ButtonLabel = {
   SAVE_IN_PROGRESS: 'Saving...'
 };
 
-function createTypelist() {
-  return POINT_TYPES.map((type) => `<div class="event__type-item">
-    <input id="event-type-${capitalizeFirstLetterToLower(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}">
-      <label class="event__type-label  event__type-label--${capitalizeFirstLetterToLower(type)}" for="event-type-${capitalizeFirstLetterToLower(type)}-1">${type}</label>
+function createTypelist(offers) {
+  return offers.map(({ type }) => `<div class="event__type-item">
+    <input id="event-type-${encode(type)}-1" class="event__type-input visually-hidden" type="radio" name="event-type" value="${encode(type)}">
+      <label class="event__type-label  event__type-label--${encode(type)}" for="event-type-${encode(type)}-1">${capitalizeFirstLetter(encode(type))}</label>
   </div>`).join('');
 }
 
@@ -26,21 +26,19 @@ function createDestinationsList(destinations) {
 }
 
 function createDestinationsItems(destinations) {
-  return destinations.map((destination) => `<option value="${destination.name}"></option>`).join('');
+  return destinations.map((destination) => `<option value="${encode(destination.name)}"></option>`).join('');
 }
 
 function createOfferItem({ offersByType, offersId, isDisabled }) {
-  if (offersByType) {
-    return offersByType.offers.map(({ title, price, id }) => `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${id}" data-id="${id}" type="checkbox" name="event-offer-luggage" ${offersId.includes(id) ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
-        <label class="event__offer-label" for="event-offer-luggage-${id}">
-          <span class="event__offer-title">${title}</span>
+  return offersByType.offers.map(({ title, price, id }) => `<div class="event__offer-selector">
+      <input class="event__offer-checkbox visually-hidden" id="event-offer-${encode(changeToLowerCase(title))}-1" data-id="${id}" type="checkbox" name="event-offer-${encode(changeToLowerCase(title))}" ${offersId.includes(id) ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
+        <label class="event__offer-label" for="event-offer-${encode(changeToLowerCase(title))}-1">
+          <span class="event__offer-title">${encode(title)}</span>
           &plus;&euro;&nbsp;
-          <span class="event__offer-price">${price}</span>
+          <span class="event__offer-price">${encode(String(price))}</span>
         </label>
     </div>`
-    ).join('');
-  }
+  ).join('');
 }
 
 function createDestinationImg(destinationItem) {
@@ -97,7 +95,7 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
   const dateStartFormat = humanizePointDate(dateFrom, FULL_DATE_TIME_FORMAT);
   const dateEndFormat = humanizePointDate(dateTo, FULL_DATE_TIME_FORMAT);
 
-  const typeList = createTypelist();
+  const typeList = createTypelist(offers);
 
   return (
     `<li class="trip-events__item">
@@ -106,7 +104,7 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${encode(type)}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -120,9 +118,9 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${type}
+              ${encode(type)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationItem ? he.encode(destinationItem.name) : ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationItem ? encode(destinationItem.name) : ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
             ${destinationsList}
           </div>
 
@@ -139,7 +137,7 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${encode(String(basePrice))}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
           ${createSaveButtonTemplate({ isSaving, isDisabled })}
@@ -159,7 +157,7 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
           ${destinationItem ? `
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${destinationItem.description ? destinationItem.description : ''}</p>
+            <p class="event__destination-description">${destinationItem.description ? encode(destinationItem.description) : ''}</p>
 
             <div class="event__photos-container">
               <div class="event__photos-tape">
@@ -307,7 +305,7 @@ export default class FormEditView extends AbstractStatefulView {
     this._setState({
       point: {
         ...this._state.point,
-        offers: checkedBoxes.map((element) => +element.dataset.id)
+        offers: checkedBoxes.map((element) => element.dataset.id)
       }
     });
   };

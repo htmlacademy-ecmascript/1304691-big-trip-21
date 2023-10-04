@@ -24,10 +24,6 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function capitalizeFirstLetterToLower(string) {
-  return string.charAt(0).toLowerCase() + string.slice(1);
-}
-
 function getWeightForNullDate(dateA, dateB) {
   if (dateA === null && dateB === null) {
     return 0;
@@ -102,6 +98,10 @@ function adaptToClient(point) {
   return adaptedPoint;
 }
 
+function changeToLowerCase(name) {
+  return name.split(' ').join('').toLowerCase();
+}
+
 export {
   isEscapeKey,
   humanizePointDate,
@@ -110,8 +110,8 @@ export {
   sortPointsByPrice,
   sortPointsByDay,
   isBigDifference,
-  capitalizeFirstLetterToLower,
   updateItem,
   adaptToServer,
-  adaptToClient
+  adaptToClient,
+  changeToLowerCase
 };

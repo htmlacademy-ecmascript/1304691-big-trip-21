@@ -3,7 +3,7 @@ import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import SortView from '../view/sort-view';
 import ListView from '../view/list-view';
 import NoPointsView from '../view/no-points-view';
-import LoadingView from '../view/loading-view';
+import LoadingMessageView from '../view/loading-view';
 import PointPresenter from './point-presenter';
 import { filter } from '../utils/filter';
 import { SortType, enabledSortType, UpdateType, UserAction, FilterType, TimeLimit } from '../const';
@@ -25,7 +25,7 @@ export default class BoardPresenter {
   #sortComponent = null;
   #pointsListComponent = new ListView();
   #noPointsComponent = null;
-  #loadingComponent = new LoadingView();
+  #loadingComponent = new LoadingMessageView();
 
   #pointPresenters = new Map();
   #newPointPresenter = null;
@@ -60,6 +60,10 @@ export default class BoardPresenter {
     this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
+  init() {
+    this.#renderBoard();
+  }
+
   createPoint() {
     this.#isCreating = true;
 
@@ -68,10 +72,6 @@ export default class BoardPresenter {
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
 
     this.#newPointPresenter.init();
-
-    if (this.points.length === 0) {
-      this.#renderSort();
-    }
 
     if (this.#noPointsComponent) {
       remove(this.#noPointsComponent);
@@ -93,6 +93,7 @@ export default class BoardPresenter {
       case SortType.DEFAULT:
         return filteredPoints.sort(sortPointsByDay);
     }
+
     return this.filteredPoints;
   }
 
@@ -230,13 +231,13 @@ export default class BoardPresenter {
   #renderBoard() {
     render(this.#pointsListComponent, tripEvents);
 
-    if (this.points.length === 0) {
-      this.#renderNoPoints();
+    if (this.#isLoading) {
+      this.#renderLoading();
       return;
     }
 
-    if (this.#isLoading) {
-      this.#renderLoading();
+    if (this.points.length === 0) {
+      this.#renderNoPoints();
       return;
     }
 

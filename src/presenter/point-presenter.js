@@ -8,6 +8,7 @@ const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING'
 };
+
 export default class PointPresenter {
   #containerPoints = null;
   #pointComponent = null;
@@ -60,12 +61,13 @@ export default class PointPresenter {
       return;
     }
 
-    if (this.#mode === 'DEFAULT') {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#pointComponent, prevPointComponent);
     }
 
-    if (this.#mode === 'EDITING') {
-      replace(this.#formEditComponent, prevFormEditComponent);
+    if (this.#mode === Mode.EDITING) {
+      replace(this.#pointComponent, prevFormEditComponent);
+      this.#mode = Mode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -74,7 +76,7 @@ export default class PointPresenter {
   }
 
   resetView() {
-    if (this.#mode !== 'DEFAULT') {
+    if (this.#mode !== Mode.DEFAULT) {
       this.#formEditComponent.reset(this.#point);
       this.#replaceFormEditToPoint();
     }
@@ -104,19 +106,18 @@ export default class PointPresenter {
   setAborting() {
     if (this.#mode === Mode.DEFAULT) {
       this.pointComponent.shake();
+      return;
     }
 
-    if (this.#mode === Mode.EDITING) {
-      const resetFormState = () => {
-        this.#formEditComponent.updateElement({
-          isDisabled: false,
-          isSaving: false,
-          isDeleting: false
-        });
-      };
+    const resetFormState = () => {
+      this.#formEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
 
-      this.#formEditComponent.shake(resetFormState);
-    }
+    this.#formEditComponent.shake(resetFormState);
   }
 
   #replacePointToFormEdit() {
@@ -145,8 +146,6 @@ export default class PointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       updatedPoint
     );
-
-    this.#replaceFormEditToPoint();
 
   };
 
