@@ -1,5 +1,4 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { getTripTitle, getTripDuration, getTripCost } from '../utils/trip-info.js';
 
 function createInfoTemplate({ isEmpty, title, duration, cost }) {
   if (isEmpty) {
@@ -21,24 +20,26 @@ function createInfoTemplate({ isEmpty, title, duration, cost }) {
   );
 }
 export default class InfoView extends AbstractView {
-  #destinations = null;
-  #offers = null;
-  #points = 0;
+  #isEmpty = null;
+  #title = null;
+  #duration = null;
+  #cost = null;
 
-  constructor({ destinations, offers, points }) {
+  constructor({ isEmpty = true, title = '', duration = '', cost = '' }) {
     super();
 
-    this.#destinations = destinations;
-    this.#offers = offers;
-    this.#points = points;
+    this.#isEmpty = isEmpty;
+    this.#title = title;
+    this.#duration = duration;
+    this.#cost = cost;
   }
 
   get template() {
     return createInfoTemplate({
-      isEmpty: this.#points.length === 0,
-      title: getTripTitle(this.#points, this.#destinations),
-      duration: getTripDuration(this.#points),
-      cost: getTripCost(this.#points, this.#offers)
+      isEmpty: this.#isEmpty,
+      title: this.#title,
+      duration: this.#duration,
+      cost: this.#cost
     });
   }
 }

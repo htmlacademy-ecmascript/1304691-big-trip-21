@@ -1,6 +1,6 @@
 export default class DestinationsModel {
   #service = null;
-  #destinations = ['fggfg'];
+  #destinations = [];
 
   constructor(service) {
     this.#service = service;
@@ -12,7 +12,6 @@ export default class DestinationsModel {
   }
 
   get destinations() {
-    console.log(this.#destinations)
     return this.#destinations;
   }
 

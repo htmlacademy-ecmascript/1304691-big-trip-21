@@ -102,6 +102,10 @@ function changeToLowerCase(name) {
   return name.split(' ').join('').toLowerCase();
 }
 
+function getCheckedOffers(checkedOffersId, pointOffers) {
+  return checkedOffersId.map((IdOffer) => pointOffers.find((offer) => offer.id === IdOffer));
+}
+
 export {
   isEscapeKey,
   humanizePointDate,
@@ -113,5 +117,6 @@ export {
   updateItem,
   adaptToServer,
   adaptToClient,
-  changeToLowerCase
+  changeToLowerCase,
+  getCheckedOffers
 };
