@@ -2,7 +2,7 @@ const DATE_TIME_FORMAT = 'HH:mm';
 const FULL_DATE_TIME_FORMAT = 'DD/MM/YY HH:mm';
 const DATE_MONTH_FORMAT = 'MMM D';
 
-const DEFAULT_TYPE = 'Flight';
+const DEFAULT_TYPE = 'flight';
 
 const OFFER_EMPTY = {
   type: DEFAULT_TYPE,
