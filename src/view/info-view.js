@@ -25,7 +25,7 @@ export default class InfoView extends AbstractView {
   #duration = null;
   #cost = null;
 
-  constructor({ isEmpty = true, title = '', duration = '', cost = '' }) {
+  constructor({ isEmpty, title = '', duration = '', cost = '' }) {
     super();
 
     this.#isEmpty = isEmpty;

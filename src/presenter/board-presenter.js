@@ -237,6 +237,7 @@ export default class BoardPresenter {
 
     if (this.#isLoading) {
       this.#renderLoading();
+      this.#blockNewPointButton();
       return;
     }
 
@@ -246,6 +247,7 @@ export default class BoardPresenter {
       return;
     }
 
+    this.#unBlockNewPointButton();
     this.#renderSort();
     this.#renderPoints(this.points);
   }
@@ -255,6 +257,7 @@ export default class BoardPresenter {
       filterType: this.#filterType,
       isServerAvailable
     });
+
     if (!isServerAvailable) {
       this.#blockNewPointButton();
     }
@@ -264,7 +267,7 @@ export default class BoardPresenter {
 
   #newPointDestroyHandler = ({ isCanceled }) => {
     this.#isCreating = false;
-    this.#blockNewPointButton();
+    this.#unBlockNewPointButton();
     if (this.points.length === 0 && isCanceled) {
       remove(this.#sortComponent);
       this.#renderBoard();

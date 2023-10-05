@@ -1,26 +1,19 @@
 import { render, remove, replace } from '../framework/render';
 import FilterView from '../view/filters-view';
-import InfoView from '../view/info-view';
 import { filter } from '../utils/filter';
 import { UpdateType } from '../const';
 
 export default class HeaderPresenter {
   #filterComponent = null;
-  #infoViewComponent = null;
 
   #pointsModel = null;
   #filterModel = null;
-  #destinationsModel = null;
-  #offersModel = null;
 
   #tripMainEventsContainer = null;
 
-
-  constructor({ pointsModel, filterModel, tripMainEventsContainer, offersModel, destinationsModel }) {
+  constructor({ pointsModel, filterModel, tripMainEventsContainer }) {
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
-    this.#offersModel = offersModel;
-    this.#destinationsModel = destinationsModel;
 
     this.#tripMainEventsContainer = tripMainEventsContainer;
 
@@ -29,14 +22,6 @@ export default class HeaderPresenter {
   }
 
   init() {
-    this.#infoViewComponent = new InfoView({
-      destinations: this.#destinationsModel.destinations,
-      offers: this.#offersModel.offers,
-      points: this.#pointsModel.points
-    });
-
-    render(this.#infoViewComponent, this.#tripMainEventsContainer);
-
     this.#initFilter();
   }
 

@@ -28,7 +28,7 @@ export default class TripInfoPresenter {
       this.#sortedPoints = this.#pointsModel.points.sort(sortPointsByDay);
 
       this.#tripInfoComponent = new InfoView({
-        isEmpty: this.#pointsModel.points.length === 0,
+        isEmpty: false,
         title: this.#getTripTitle(this.#pointsModel.points, this.#destinationsModel.destinations),
         duration: this.#getTripDuration(this.#pointsModel.points),
         cost: this.#getTripCost()
@@ -42,7 +42,7 @@ export default class TripInfoPresenter {
       replace(this.#tripInfoComponent, prevTripInfoComponent);
       remove(prevTripInfoComponent);
     } else {
-      this.#tripInfoComponent = new InfoView();
+      this.#tripInfoComponent = new InfoView({ isEmpty: true });
       render(this.#tripInfoComponent, this.#tripMainEventsContainer, RenderPosition.AFTERBEGIN);
       remove(prevTripInfoComponent);
     }

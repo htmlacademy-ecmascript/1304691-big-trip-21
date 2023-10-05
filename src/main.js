@@ -38,7 +38,7 @@ new TripInfoPresenter({
   pointsModel
 });
 
-const headerPresenter = new HeaderPresenter({ pointsModel, filterModel, offersModel, destinationsModel, tripMainEventsContainer });
+const headerPresenter = new HeaderPresenter({ pointsModel, filterModel, tripMainEventsContainer });
 
 function newPointButtonClickHandler() {
   newPointButtonComponent.element.disabled = true;
@@ -46,7 +46,7 @@ function newPointButtonClickHandler() {
 }
 
 function blockNewPointButton() {
-  newPointButtonComponent.element.disabled = false;
+  newPointButtonComponent.element.disabled = true;
 }
 
 function unBlockNewPointButton() {
