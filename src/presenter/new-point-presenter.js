@@ -10,14 +10,12 @@ export default class NewPointPresenter {
   #formNewComponent = null;
 
   #offersModel = null;
-  #allTypesPoints = null;
   #destinationsModel = null;
 
-  constructor({ allTypesPoints, offersModel, destinationsModel, pointsListContainer, onDataChange, onDestroy }) {
-    this.#allTypesPoints = allTypesPoints;
-    this.#pointsListContainer = pointsListContainer;
+  constructor({ offersModel, destinationsModel, pointsListContainer, onDataChange, onDestroy }) {
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+    this.#pointsListContainer = pointsListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
   }
@@ -32,7 +30,6 @@ export default class NewPointPresenter {
       isNewPoint: true,
       offers: this.#offersModel.offers,
       destinations: this.#destinationsModel.destinations,
-      allTypesPoints: this.#allTypesPoints,
       onSaveButtonClick: this.#formSubmitHandler,
       onResetButtonClick: this.#resetClickHandler
     });
@@ -71,7 +68,6 @@ export default class NewPointPresenter {
         isDeleting: false,
       });
     };
-
     this.#formNewComponent.shake(resetFormState);
   }
 
