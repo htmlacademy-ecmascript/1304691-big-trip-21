@@ -56,7 +56,7 @@ export default class BoardPresenter {
       destinationsModel: this.#destinationsModel,
       pointsListContainer: this.#pointsListComponent.element,
       onDataChange: this.#viewActionHandler,
-      onDestroy: this.#newPointDestroyHandler
+      onDestroy: this.#newPointDestroyHandler,
     });
 
     this.#pointsModel.addObserver(this.#modelEventHandler);
@@ -247,7 +247,10 @@ export default class BoardPresenter {
       return;
     }
 
-    this.#unBlockNewPointButton();
+    if (!this.#isCreating) {
+      this.#unBlockNewPointButton();
+    }
+
     this.#renderSort();
     this.#renderPoints(this.points);
   }

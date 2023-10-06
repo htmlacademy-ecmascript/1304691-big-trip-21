@@ -41,9 +41,16 @@ function createOfferItem({ offersByType, offersId, isDisabled }) {
   ).join('');
 }
 
-function createDestinationImg(destinationItem) {
+function createDestinationImgList(destinationItem) {
   return destinationItem.pictures.map(({ src, description }) => `<img class="event__photo" src="${src}" alt="${description}" />
   `).join('');
+}
+function createDestinationImgContainer(destinationItem) {
+  return `<div class="event__photos-container">
+      <div class="event__photos-tape">
+        ${createDestinationImgList(destinationItem)}
+      </div>
+    </div>`;
 }
 
 function createDeleteButtonTemplate({ isNewPoint, isDeleting, isDisabled }) {
@@ -68,6 +75,18 @@ function createSaveButtonTemplate({ isSaving, isDisabled }) {
   return `<button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${label}</button>`;
 }
 
+function createDestinationTemplate(destinationItem, destinationPictures) {
+  if (destinationItem.description || destinationPictures.length !== 0) {
+    return `<section class="event__section  event__section--destination">
+    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+    <p class="event__destination-description">${destinationItem.description ? encode(destinationItem.description) : ''}</p>
+    ${destinationPictures.length !== 0 ? createDestinationImgContainer(destinationItem) : ''}
+  </section>`;
+  }
+
+  return '';
+}
+
 function createFormTemplate({ isNewPoint, state, destinations, offers }) {
 
   const { point, isSaving, isDeleting, isDisabled } = state;
@@ -77,12 +96,6 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
   const destinationsList = createDestinationsList(destinations);
 
   const destinationItem = destinations.find((item) => item.id === destination);
-
-  let destinationPictures = '';
-
-  if (destinationItem && destinationItem.pictures) {
-    destinationPictures = createDestinationImg(destinationItem);
-  }
 
   const offersByType = offers.find((offer) => offer.type === type);
 
@@ -106,7 +119,7 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${encode(type)}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+            <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox" ${isSaving || isDeleting ? ' disabled' : ''}>
 
               <div class="event__type-list">
                 <fieldset class="event__type-group" ${isDisabled ? 'disabled' : ''}>
@@ -153,20 +166,7 @@ function createFormTemplate({ isNewPoint, state, destinations, offers }) {
             </div>
           </section>
           ` : ''}
-
-          ${destinationItem ? `
-          <section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${destinationItem.description ? encode(destinationItem.description) : ''}</p>
-
-            <div class="event__photos-container">
-              <div class="event__photos-tape">
-                ${destinationPictures ? destinationPictures : ''}
-              </div>
-            </div>
-          </section>
-          ` : ''}
-
+          ${destinationItem ? createDestinationTemplate(destinationItem, destinationItem.pictures) : ''}
         </section>
 
       </form>
