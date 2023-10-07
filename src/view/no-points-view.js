@@ -11,7 +11,6 @@ const NoPointsMessageType = {
 function createNoPointsMessage(filterType, isError) {
   const noPointsMessageValue = NoPointsMessageType[filterType];
 
-  console.log(isError)
   return isError ? (
     '<p class="trip-events__msg">Failed to load latest route information</p>') : `<p class="trip-events__msg">${noPointsMessageValue}</p>`;
 }
