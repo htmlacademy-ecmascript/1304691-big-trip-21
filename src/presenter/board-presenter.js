@@ -102,6 +102,7 @@ export default class BoardPresenter {
 
   #viewActionHandler = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
+    console.log(update)
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointPresenters.get(update.id).setSaving();
@@ -132,6 +133,7 @@ export default class BoardPresenter {
   };
 
   #modelEventHandler = (updateType, data) => {
+    const { isErorr } = data;
     switch (updateType) {
       case UpdateType.PATCH:
         return this.#pointPresenters?.get(data.id)?.init(data);
@@ -146,7 +148,7 @@ export default class BoardPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
-        this.#renderBoard();
+        this.#renderBoard(isErorr);
         break;
     }
   };
@@ -231,7 +233,7 @@ export default class BoardPresenter {
 
   }
 
-  #renderBoard() {
+  #renderBoard(isError = false) {
     this.#isServerAvailable = Boolean(this.points);
     render(this.#pointsListComponent, tripEvents);
 
@@ -243,7 +245,7 @@ export default class BoardPresenter {
 
     if (!this.#isServerAvailable || this.points.length === 0) {
       this.#unBlockNewPointButton();
-      this.#renderNoPoints(this.#isServerAvailable);
+      this.#renderNoPoints(isError);
       return;
     }
 
@@ -255,13 +257,13 @@ export default class BoardPresenter {
     this.#renderPoints(this.points);
   }
 
-  #renderNoPoints(isServerAvailable) {
+  #renderNoPoints(isError) {
     this.#noPointsComponent = new NoPointsView({
       filterType: this.#filterType,
-      isServerAvailable
+      isError
     });
 
-    if (!isServerAvailable) {
+    if (isError) {
       this.#blockNewPointButton();
     }
 
