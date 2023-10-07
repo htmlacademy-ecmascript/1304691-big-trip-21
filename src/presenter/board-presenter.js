@@ -56,7 +56,7 @@ export default class BoardPresenter {
       destinationsModel: this.#destinationsModel,
       pointsListContainer: this.#pointsListComponent.element,
       onDataChange: this.#viewActionHandler,
-      onDestroy: this.#newPointDestroyHandler
+      onDestroy: this.#newPointDestroyHandler,
     });
 
     this.#pointsModel.addObserver(this.#modelEventHandler);
@@ -132,6 +132,7 @@ export default class BoardPresenter {
   };
 
   #modelEventHandler = (updateType, data) => {
+    const { isErorr } = data;
     switch (updateType) {
       case UpdateType.PATCH:
         return this.#pointPresenters?.get(data.id)?.init(data);
@@ -146,7 +147,7 @@ export default class BoardPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
-        this.#renderBoard();
+        this.#renderBoard(isErorr);
         break;
     }
   };
@@ -231,31 +232,37 @@ export default class BoardPresenter {
 
   }
 
-  #renderBoard() {
+  #renderBoard(isError = false) {
     this.#isServerAvailable = Boolean(this.points);
     render(this.#pointsListComponent, tripEvents);
 
     if (this.#isLoading) {
       this.#renderLoading();
+      this.#blockNewPointButton();
       return;
     }
 
     if (!this.#isServerAvailable || this.points.length === 0) {
       this.#unBlockNewPointButton();
-      this.#renderNoPoints(this.#isServerAvailable);
+      this.#renderNoPoints(isError);
       return;
+    }
+
+    if (!this.#isCreating) {
+      this.#unBlockNewPointButton();
     }
 
     this.#renderSort();
     this.#renderPoints(this.points);
   }
 
-  #renderNoPoints(isServerAvailable) {
+  #renderNoPoints(isError) {
     this.#noPointsComponent = new NoPointsView({
       filterType: this.#filterType,
-      isServerAvailable
+      isError
     });
-    if (!isServerAvailable) {
+
+    if (isError) {
       this.#blockNewPointButton();
     }
 
@@ -264,7 +271,7 @@ export default class BoardPresenter {
 
   #newPointDestroyHandler = ({ isCanceled }) => {
     this.#isCreating = false;
-    this.#blockNewPointButton();
+    this.#unBlockNewPointButton();
     if (this.points.length === 0 && isCanceled) {
       remove(this.#sortComponent);
       this.#renderBoard();
