@@ -102,7 +102,6 @@ export default class BoardPresenter {
 
   #viewActionHandler = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
-    console.log(update)
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointPresenters.get(update.id).setSaving();
